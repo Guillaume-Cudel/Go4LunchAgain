@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="90dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/list_view_image"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/ten"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/go4lunch_background" />
+
+    <TextView
+        android:id="@+id/list_view_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/list_view_image"
+        android:layout_marginStart="@dimen/ten"
+        android:text="Restaurant name"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"/>
+
+    <TextView
+        android:id="@+id/list_view_kind_restaurant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/list_view_name"
+        app:layout_constraintTop_toBottomOf="@+id/list_view_name"
+        android:layout_marginTop="@dimen/five"
+        android:text="French"
+        android:textSize="12sp"/>
+
+    <TextView
+        android:id="@+id/list_view_space"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/list_view_kind_restaurant"
+        app:layout_constraintTop_toTopOf="@+id/list_view_kind_restaurant"
+        app:layout_constraintBottom_toBottomOf="@id/list_view_kind_restaurant"
+        android:layout_marginStart="1dp"
+        android:text="-"
+        android:textSize="12sp"/>
+
+    <TextView
+        android:id="@+id/list_view_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/list_view_space"
+        app:layout_constraintTop_toTopOf="@+id/list_view_kind_restaurant"
+        app:layout_constraintBottom_toBottomOf="@id/list_view_kind_restaurant"
+        android:layout_marginStart="1dp"
+        android:text="5 rue des marguerites"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/list_view_informations"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/list_view_name"
+        app:layout_constraintTop_toBottomOf="@id/list_view_kind_restaurant"
+        android:layout_marginTop="@dimen/five"
+        android:text="No opening information"
+        android:textSize="10sp"
+        android:textStyle="italic"/>
+
+    <TextView
+        android:id="@+id/list_view_opening_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/list_view_informations"
+        app:layout_constraintBottom_toBottomOf="@+id/list_view_informations"
+        app:layout_constraintTop_toTopOf="@+id/list_view_informations"
+        android:layout_marginStart="@dimen/five"
+        android:textSize="10sp"
+        android:textStyle="italic"/>
+
+    <TextView
+        android:id="@+id/list_view_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/list_view_image"
+        app:layout_constraintTop_toTopOf="@id/list_view_image"
+
+        android:layout_marginEnd="20dp"
+        android:text="120 m"
+        android:textColor="@color/grey"/>
+
+    <TextView
+        android:id="@+id/list_view_number_workmates"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/list_view_image"
+        app:layout_constraintBottom_toBottomOf="@id/list_view_kind_restaurant"
+        android:text="(0)"
+        android:textStyle="bold"
+        android:textSize="12sp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="@dimen/five"/>
+
+    <ImageView
+        android:id="@+id/list_view_workmates_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/list_view_number_workmates"
+        app:layout_constraintTop_toTopOf="@id/list_view_kind_restaurant"
+        android:src="@drawable/ic_baseline_perm_identity_20" />
+
+    <ImageView
+        android:id="@+id/list_view_star_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/list_view_informations"
+        app:layout_constraintEnd_toStartOf="@id/list_view_image"
+        android:layout_marginEnd="@dimen/five"
+        android:src="@drawable/ic_baseline_star_rate"/>
+
+    <ImageView
+        android:id="@+id/list_view_star_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/list_view_informations"
+        app:layout_constraintEnd_toStartOf="@id/list_view_star_1"
+        android:src="@drawable/ic_baseline_star_rate"/>
+
+    <ImageView
+        android:id="@+id/list_view_star_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/list_view_informations"
+        app:layout_constraintEnd_toStartOf="@id/list_view_star_2"
+        android:src="@drawable/ic_baseline_star_rate"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

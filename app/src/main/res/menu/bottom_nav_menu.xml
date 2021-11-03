@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/navigation_map"
+        android:icon="@drawable/ic_map_24"
+        android:title="@string/title_map"
+        />
+
+    <item
+        android:id="@+id/navigation_restaurants_list"
+        android:icon="@drawable/ic_view_list_24"
+        android:title="@string/title_restaurants_list" />
+
+    <item
+        android:id="@+id/navigation_workmates"
+        android:icon="@drawable/ic_people_24"
+        android:title="@string/title_workmates" />
+
+</menu>

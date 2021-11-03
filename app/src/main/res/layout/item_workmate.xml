@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="90dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/workmate_image_item"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="@dimen/ten"
+        android:src="@drawable/go4lunch_background"/>
+
+    <TextView
+        android:id="@+id/workmate_text_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/workmate_image_item"
+        app:layout_constraintTop_toTopOf="@id/workmate_image_item"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="25dp"
+        android:text="Jacob is joining !"
+        android:maxLength="40"
+        android:textSize="15sp"
+        android:textColor="@color/black"/>
+
+    <TextView
+        android:id="@+id/restaurant_text_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/workmate_text_item"
+        app:layout_constraintStart_toStartOf="@id/workmate_text_item"
+        android:layout_marginTop="5dp"
+        android:text=""
+        android:maxLength="40"
+        android:textSize="15sp"
+        android:textColor="@color/black"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
