@@ -92,7 +92,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
+        loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
         navActivity = (NavigationActivity) getActivity();
         locationViewModel = new ViewModelProvider(navActivity).get(LocationViewModel.class);
         mRestaurantVM = Injection.provideRestaurantViewModel(getActivity());
@@ -126,7 +126,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         if (mLatlng != null) {
             plotBlueDot();
-            recoveRestaurants(mLatlng.latitude, mLatlng.longitude, mRadius);
+            recoveRestaurantsFromPlace(mLatlng.latitude, mLatlng.longitude, mRadius);
         }
 
         // verify permission
@@ -143,13 +143,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void initLocationviewModel() {
-        if(navActivity != null) {
+        if (navActivity != null) {
             locationViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
                 @Override
                 public void onChanged(LatLng latLng) {
                     mLatlng = latLng;
                     plotBlueDot();
-                    recoveRestaurants(mLatlng.latitude, mLatlng.longitude, mRadius);
+                    recoveRestaurantsFromDatabase();
                 }
             });
         }
@@ -164,7 +164,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         });
     }
 
-    private void recoveRestaurants(double latitude, double longitude, String scope) {
+    private void recoveRestaurantsFromDatabase() {
+        mFirestoreRestaurantVM.getAllRestaurants().observe(requireActivity(), new Observer<List<Restaurant>>() {
+            @Override
+            public void onChanged(List<Restaurant> restaurants) {
+                MapFragment.this.restaurantsSaved.clear();
+                MapFragment.this.restaurantsSaved.addAll(restaurants);
+                recoveRestaurantsFromPlace(mLatlng.latitude, mLatlng.longitude, mRadius);
+            }
+        });
+    }
+
+    private void recoveRestaurantsFromPlace(double latitude, double longitude, String scope) {
         String locationText = latitude + "," + longitude;
 
         if (scope != null) {
@@ -175,6 +186,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     MapFragment.this.restaurantsList.addAll(restaurants);
 
                     for (int i = 0; i < restaurantsList.size(); i++) {
+                        boolean isSaved = false;
                         Restaurant restaurant = restaurantsList.get(i);
                         String rate = null;
                         String type = restaurant.getTypes().get(0);
@@ -189,8 +201,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                             photoData = photoInformation.get(0).getPhotoReference();
                             photoWidth = photoInformation.get(0).getWidth();
                         }
-                        addRestaurantsToDatabase(restaurant.getPlace_id(), photoData, photoWidth, restaurant.getName(), restaurant.getVicinity(),
-                                type, rate, restaurant.getGeometry(), restaurant.getDetails(), restaurant.getOpening_hours());
+                        for (Restaurant r : restaurantsSaved) {
+                            if (r.getPlace_id().equals(restaurant.getPlace_id())) {
+                                isSaved = true;
+                            }
+                        }
+                        if(!isSaved){
+                            addRestaurantsToDatabase(restaurant.getPlace_id(), photoData, photoWidth, restaurant.getName(), restaurant.getVicinity(),
+                                    type, rate, restaurant.getGeometry(), restaurant.getDetails(), restaurant.getOpening_hours());
+                        }
                     }
                     markRestaurantsFromDatabase();
                 }
@@ -200,48 +219,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void addRestaurantsToDatabase(String placeID, String photoData, String photoWidth, String name, String vicinity,
-                                          String type, String rating, Geometry geometry, Details detail, OpeningHours openingHours){
+                                          String type, String rating, Geometry geometry, Details detail, OpeningHours openingHours) {
 
-                mFirestoreRestaurantVM.createRestaurant(placeID, photoData, photoWidth, name,
-                        vicinity, type, rating, geometry, detail, openingHours);
+        mFirestoreRestaurantVM.createRestaurant(placeID, photoData, photoWidth, name,
+                vicinity, type, rating, geometry, detail, openingHours);
     }
 
-    private void markRestaurantsFromDatabase(){
-        if(restaurantsList.size() > 0) {
-            mFirestoreRestaurantVM.getAllRestaurants().observe(navActivity, new Observer<List<Restaurant>>() {
-                @Override
-                public void onChanged(List<Restaurant> restaurants) {
-                    MapFragment.this.restaurantsSaved.clear();
-                    MapFragment.this.restaurantsSaved.addAll(restaurants);
+    private void markRestaurantsFromDatabase() {
+        if (restaurantsList.size() > 0) {
 
-                    for (int i = 0; i < restaurantsSaved.size(); i++) {
-                        Restaurant restaurant = restaurantsSaved.get(i);
-                        LatLng restaurantLocation = null;
-                        //todo put recoveLocation method
-                        if(restaurant.getGeometry() != null) {
-                            String restaurantLatitude = restaurant.getGeometry().getLocation().getLat();
-                            String restaurantLongitude = restaurant.getGeometry().getLocation().getLng();
-                            double rLatitude = Double.parseDouble(restaurantLatitude);
-                            double rLongitude = Double.parseDouble(restaurantLongitude);
-                            restaurantLocation = new LatLng(rLatitude, rLongitude);
-                        }
-
-                        String infoRate;
-                        if (restaurant.getRating() != null) {
-                            infoRate = "Rate: " + restaurant.getRating();
-                        } else {
-                            infoRate = "No rating";
-                        }
-
-                        if (restaurant.getParticipantsNumber() > 0) {
-                            setGreenMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
-                        } else {
-                            setRedMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
-                        }
-                    }
-                    //loading.cancel();
+            for (int i = 0; i < restaurantsSaved.size(); i++) {
+                Restaurant restaurant = restaurantsSaved.get(i);
+                LatLng restaurantLocation = recoveLatLng(restaurant);
+                String infoRate;
+                if (restaurant.getRating() != null) {
+                    infoRate = "Rate: " + restaurant.getRating();
+                } else {
+                    infoRate = "No rating";
                 }
-            });
+                if (restaurant.getParticipantsNumber() > 0) {
+                    setGreenMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
+                } else {
+                    setRedMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
+                }
+            }
+            loading.cancel();
+
         }
     }
 
@@ -293,7 +296,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         super.onResume();
         //todo get info to navigation activity --- test it
         recoveRadius();
-        //recoveRestaurants(mLatlng.latitude, mLatlng.longitude, mRadius);
         markRestaurantsFromDatabase();
 
     }
@@ -314,8 +316,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             String place_id = restaurant.getPlace_id();
             String rating = restaurant.getRating();
             String type = null;
-            if (restaurant.getTypes() != null){
-                type = restaurant.getTypes().get(0);;
+            if (restaurant.getTypes() != null) {
+                type = restaurant.getTypes().get(0);
+                ;
             }
 
             Intent i = new Intent(getActivity(), RestaurantProfilActivity.class);
@@ -358,6 +361,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         double rLatitude = Double.parseDouble(restaurantLatitude);
         double rLongitude = Double.parseDouble(restaurantLongitude);
 
-        return new LatLng(rLatitude,rLongitude);
+        return new LatLng(rLatitude, rLongitude);
     }
 }
