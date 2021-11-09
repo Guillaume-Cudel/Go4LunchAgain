@@ -98,7 +98,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mRestaurantVM = Injection.provideRestaurantViewModel(getActivity());
         mFirestoreRestaurantVM = Injection.provideFirestoreRestaurantViewModel(getActivity());
         mFirestoreUserVM = Injection.provideFirestoreUserViewModel(getActivity());
-        initLocationviewModel();
+        //initLocationviewModel();
         recoveRadius();
 
         mapFragment = SupportMapFragment.newInstance();
@@ -155,11 +155,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    private void recoveRadius() {
+    public void recoveRadius() {
         mFirestoreUserVM.getUser(userUid).observe(requireActivity(), new Observer<UserFirebase>() {
             @Override
             public void onChanged(UserFirebase user) {
                 mRadius = user.getCurrentRadius();
+                initLocationviewModel();
             }
         });
     }
@@ -296,7 +297,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         super.onResume();
         //todo get info to navigation activity --- test it
         recoveRadius();
-        markRestaurantsFromDatabase();
+        //initLocationviewModel();
+        //markRestaurantsFromDatabase();
+        //recoveRestaurantsFromDatabase();
 
     }
 
@@ -316,21 +319,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             String place_id = restaurant.getPlace_id();
             String rating = restaurant.getRating();
             String type = null;
+            String photoData = null;
+            String photoWidth = null;
             if (restaurant.getTypes() != null) {
                 type = restaurant.getTypes().get(0);
-                ;
             }
 
             Intent i = new Intent(getActivity(), RestaurantProfilActivity.class);
             i.putExtra("place_id", place_id);
             i.putExtra("name", restaurant.getName());
-            if (restaurant.getPhotos() != null) {
-                List<Photos> photoInformation = restaurant.getPhotos();
-                String photoData = photoInformation.get(0).getPhotoReference();
-                String photoWidth = photoInformation.get(0).getWidth();
-                i.putExtra("photo", photoData);
-                i.putExtra("photoWidth", photoWidth);
+            if (restaurant.getPhotoReference() != null) {
+                photoData = restaurant.getPhotoReference();
+                photoWidth = restaurant.getPhotoWidth();
             }
+            i.putExtra("photo", photoData);
+            i.putExtra("photoWidth", photoWidth);
             i.putExtra("vicinity", restaurant.getVicinity());
             i.putExtra("type", type);
             i.putExtra("rate", rating);

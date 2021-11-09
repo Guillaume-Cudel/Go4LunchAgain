@@ -71,6 +71,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private LocationViewModel locationViewModel;
     private FirestoreUserViewModel firestoreUserViewModel;
     private FirestoreRestaurantViewModel firestoreRestaurantViewModel;
+    private MapFragment mapFragment;
     private LocationCallback locationCallback;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser authUser = mAuth.getCurrentUser();
@@ -115,6 +116,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
         // Show the first fragment when starting activity
         fragmentMap = new MapFragment();
+        mapFragment = new MapFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.nav_host_fragment, fragmentMap);
         fragmentTransaction.commit();
@@ -235,6 +237,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 showRestaurantChoosed();
                 break;
             case R.id.nav_settings:
+                mapFragment.onPause();
                 openSettings();
                 break;
             case R.id.nav_log_out:
@@ -497,6 +500,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                     int currentRadius = radiusBar.getProgress();
                     String finalRadius = String.valueOf(currentRadius);
                     firestoreUserViewModel.updateRadius(userUid, finalRadius);
+                    mapFragment.onResume();
                     dialog.cancel();
 
 

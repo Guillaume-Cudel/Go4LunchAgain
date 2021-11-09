@@ -37,5 +37,6 @@
     <string name="settings_dialog_title">Select the scope of restaurants recovery :</string>
     <string name="search_title">search</string>
     <string name="search_hint">Look for a restaurant</string>
+    <string name="wormateNoChooseRestaurant">This workmate doesn\'t have choose a restaurant yet</string>
 
 </resources>

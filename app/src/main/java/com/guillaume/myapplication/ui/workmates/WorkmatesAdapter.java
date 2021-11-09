@@ -1,34 +1,46 @@
 package com.guillaume.myapplication.ui.workmates;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.guillaume.myapplication.NavigationActivity;
 import com.guillaume.myapplication.R;
+import com.guillaume.myapplication.di.Injection;
+import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
+import com.guillaume.myapplication.ui.restaurant_profil.RestaurantProfilActivity;
+import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
 
 import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.Text;
 
 import java.util.List;
 
 public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.WorkmatesViewHolder> {
 
     private List<UserFirebase> workmatesList;
+    private List<Restaurant> workmatesRestaurantList;
     private final Context context;
 
     public WorkmatesAdapter(final List<UserFirebase> workmatesList, Context context) {
         this.workmatesList = workmatesList;
         this.context = context;
+
     }
 
     @NotNull
@@ -73,7 +85,14 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
             holder.usernameText.setTextColor(Color.GRAY);
         }
 
+
         //todo add on item (user) click, display the restaurant profil
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.getRestaurantChoosed(user);
+            }
+        });
     }
 
     @Override
@@ -84,8 +103,13 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
         return workmatesList.size();
     }
 
-    public void updateData(List<UserFirebase> workmates){
+    public void updateWorkmateList(List<UserFirebase> workmates){
         this.workmatesList = workmates;
+        this.notifyDataSetChanged();
+    }
+
+    public void updateWorkmateRestaurantList(List<Restaurant> restaurants){
+        this.workmatesRestaurantList = restaurants;
         this.notifyDataSetChanged();
     }
 
@@ -106,5 +130,32 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
             restaurantText = mView.findViewById(R.id.restaurant_text_item);
             userPhoto = mView.findViewById(R.id.workmate_image_item);
         }
+
+        private void getRestaurantChoosed(UserFirebase user){
+            if(user.getRestaurantChoosed() != null && workmatesRestaurantList.size() > 0) {
+                boolean isGood = false;
+                Restaurant restaurant = new Restaurant();
+                for (Restaurant r : workmatesRestaurantList) {
+                    if (r.getPlace_id().equals(user.getRestaurantChoosed())) {
+                        restaurant = r;
+                        isGood = true;
+                    }
+                }
+                if (isGood){
+                    Intent i = new Intent(context, RestaurantProfilActivity.class);
+                    i.putExtra("place_id", restaurant.getPlace_id());
+                    i.putExtra("name", restaurant.getName());
+                    i.putExtra("photo", restaurant.getPhotoReference());
+                    i.putExtra("photoWidth", restaurant.getPhotoWidth());
+                    i.putExtra("vicinity", restaurant.getVicinity());
+                    i.putExtra("type", restaurant.getType());
+                    i.putExtra("rate", restaurant.getRating());
+                    context.startActivity(i);
+                }
+            }
+        }
+
+
+
     }
 }

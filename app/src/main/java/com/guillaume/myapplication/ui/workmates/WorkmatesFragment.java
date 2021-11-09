@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.di.Injection;
+import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
+import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,9 @@ public class WorkmatesFragment extends Fragment {
     private RecyclerView recyclerView;
     @NonNull
     private final ArrayList<UserFirebase> workmatesList = new ArrayList<>();
+    private ArrayList<Restaurant> workmatesRestaurantsList = new ArrayList<>();
     private WorkmatesAdapter adapter = new WorkmatesAdapter(workmatesList, this.getActivity());
+    private FirestoreUserViewModel mFirestoreUserVM;
 
     public WorkmatesFragment(){}
 
@@ -40,6 +44,7 @@ public class WorkmatesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_workmates, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_workmates_list);
+        mFirestoreUserVM = Injection.provideFirestoreUserViewModel(requireActivity());
 
         return view;
 
@@ -57,6 +62,7 @@ public class WorkmatesFragment extends Fragment {
                 WorkmatesFragment.this.workmatesList.clear();
                 WorkmatesFragment.this.workmatesList.addAll(users);
                 updateWorkmates();
+                setRestaurantChoosedList();
                 loading.cancel();
             }
         });
@@ -72,8 +78,34 @@ public class WorkmatesFragment extends Fragment {
     }
 
     private void updateWorkmates(){
-        adapter.updateData(workmatesList);
+        adapter.updateWorkmateList(workmatesList);
     }
 
+    private void updateWormatesRestaurantList(){
+        adapter.updateWorkmateRestaurantList(workmatesRestaurantsList);
+    }
 
+    // todo boucle method to get all restaurants for any users and add them to a list
+
+    private void setRestaurantChoosedList(){
+        if (workmatesList.size() > 0){
+            for (UserFirebase user : workmatesList){
+                if(user.getRestaurantChoosed() != null) {
+                    mFirestoreUserVM.getRestaurant(user.getUid(), user.getRestaurantChoosed()).observe(requireActivity(), new Observer<Restaurant>() {
+                        @Override
+                        public void onChanged(Restaurant restaurant) {
+                            workmatesRestaurantsList.add(restaurant);
+                        }
+                    });
+                }
+            }
+            updateWormatesRestaurantList();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setRestaurantChoosedList();
+    }
 }
