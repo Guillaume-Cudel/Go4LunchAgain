@@ -95,7 +95,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private static final int REQUEST_LOCATION_PERMISSION = 10;
 
 
-
     @Override
     public int getFragmentLayout() {
         return R.layout.activity_navigation;
@@ -141,14 +140,14 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     @Override
     protected void onResume() {
         super.onResume();
-            firestoreUserViewModel.getUser(userUid).observe(this, new Observer<UserFirebase>() {
-                @Override
-                public void onChanged(UserFirebase userFirebase) {
-                        mCurrentUser = userFirebase;
-                        String radiusString = userFirebase.getCurrentRadius();
-                        mRadius = Integer.parseInt(radiusString);
-                }
-            });
+        firestoreUserViewModel.getUser(userUid).observe(this, new Observer<UserFirebase>() {
+            @Override
+            public void onChanged(UserFirebase userFirebase) {
+                mCurrentUser = userFirebase;
+                String radiusString = userFirebase.getCurrentRadius();
+                mRadius = Integer.parseInt(radiusString);
+            }
+        });
 
     }
 
@@ -288,14 +287,24 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         }
     }
 
-    private void showMapFragment() {
-            if (fragmentMap == null) {
-                fragmentMap = MapFragment.newInstance();
-                startTransactionFragment(fragmentMap);
-                return;
-            }
 
+    private void showMapFragment() {
+        if (fragmentMap == null) {
+            fragmentMap = MapFragment.newInstance();
             startTransactionFragment(fragmentMap);
+            return;
+        }else {
+            // Refresh your fragment here
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.detach(fragmentMap);
+            fragmentMap = MapFragment.newInstance();
+            transaction.commitAllowingStateLoss();
+            startTransactionFragment(fragmentMap);
+            Log.w("IsRefresh", "Yes");
+        }
+
+
+        //startTransactionFragment(fragmentMap);
     }
 
     private void showRestaurantsListFragment() {
@@ -320,20 +329,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         if (!fragment.isVisible()) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.nav_host_fragment, fragment).commit();
-        }/*else{
-            // Refresh your fragment here
-
-            FragmentTransaction transaction = fragment.getFragmentManager()
-                    .beginTransaction();
-            if (Build.VERSION.SDK_INT >= 26) {
-                transaction.setReorderingAllowed(false);
-            }
-            transaction.detach(fragment).attach
-                    (fragment).commit();
-
-            //getSupportFragmentManager().beginTransaction().detach(fragment).attach(fragment).commit();
-            Log.w("IsRefresh", "Yes");
-        }*/
+        }
     }
 
 
@@ -411,25 +407,25 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     }
 
     private void showRestaurantChoosed() {
-            firestoreUserViewModel.getRestaurant(mCurrentUser.getUid(), mCurrentUser.getRestaurantChoosed()).observe(this, new Observer<Restaurant>() {
-                @Override
-                public void onChanged(Restaurant restaurant) {
-                    mRestaurant = restaurant;
-                    if(mRestaurant == null){
-                        Toast.makeText(NavigationActivity.this, R.string.NavigationChooseRestaurant, Toast.LENGTH_LONG).show();
-                    }else{
-                        Intent i = new Intent(NavigationActivity.this, RestaurantProfilActivity.class);
-                        i.putExtra("place_id", mRestaurant.getPlace_id());
-                        i.putExtra("name", mRestaurant.getName());
-                        i.putExtra("photo", mRestaurant.getPhotoReference());
-                        i.putExtra("photoWidth", mRestaurant.getPhotoWidth());
-                        i.putExtra("vicinity", mRestaurant.getVicinity());
-                        i.putExtra("type", mRestaurant.getType());
-                        i.putExtra("rate", mRestaurant.getRating());
-                        startActivity(i);
-                    }
+        firestoreUserViewModel.getRestaurant(mCurrentUser.getUid(), mCurrentUser.getRestaurantChoosed()).observe(this, new Observer<Restaurant>() {
+            @Override
+            public void onChanged(Restaurant restaurant) {
+                mRestaurant = restaurant;
+                if (mRestaurant == null) {
+                    Toast.makeText(NavigationActivity.this, R.string.NavigationChooseRestaurant, Toast.LENGTH_LONG).show();
+                } else {
+                    Intent i = new Intent(NavigationActivity.this, RestaurantProfilActivity.class);
+                    i.putExtra("place_id", mRestaurant.getPlace_id());
+                    i.putExtra("name", mRestaurant.getName());
+                    i.putExtra("photo", mRestaurant.getPhotoReference());
+                    i.putExtra("photoWidth", mRestaurant.getPhotoWidth());
+                    i.putExtra("vicinity", mRestaurant.getVicinity());
+                    i.putExtra("type", mRestaurant.getType());
+                    i.putExtra("rate", mRestaurant.getRating());
+                    startActivity(i);
                 }
-            });
+            }
+        });
 
     }
 
@@ -528,8 +524,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             dialog.show();
         }
     }
-
-
 
 
 }

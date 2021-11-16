@@ -20,6 +20,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -104,13 +105,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapFragment = SupportMapFragment.newInstance();
         mapFragment.getMapAsync(this);
         getChildFragmentManager().beginTransaction().replace(R.id.map_fragment, mapFragment).commit();
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        recoveRadius();
     }
 
     @Override
