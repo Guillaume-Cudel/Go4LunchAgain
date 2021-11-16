@@ -18,8 +18,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -241,7 +243,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 openSettings();
                 break;
             case R.id.nav_log_out:
-                //todo not work
                 FirebaseAuth.getInstance().signOut();
                 finish();
                 break;
@@ -288,12 +289,13 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     }
 
     private void showMapFragment() {
-        if (fragmentMap == null) {
-            fragmentMap = MapFragment.newInstance();
+            if (fragmentMap == null) {
+                fragmentMap = MapFragment.newInstance();
+                startTransactionFragment(fragmentMap);
+                return;
+            }
+
             startTransactionFragment(fragmentMap);
-            return;
-        }
-        startTransactionFragment(fragmentMap);
     }
 
     private void showRestaurantsListFragment() {
@@ -318,7 +320,20 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         if (!fragment.isVisible()) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.nav_host_fragment, fragment).commit();
-        }
+        }/*else{
+            // Refresh your fragment here
+
+            FragmentTransaction transaction = fragment.getFragmentManager()
+                    .beginTransaction();
+            if (Build.VERSION.SDK_INT >= 26) {
+                transaction.setReorderingAllowed(false);
+            }
+            transaction.detach(fragment).attach
+                    (fragment).commit();
+
+            //getSupportFragmentManager().beginTransaction().detach(fragment).attach(fragment).commit();
+            Log.w("IsRefresh", "Yes");
+        }*/
     }
 
 
@@ -500,7 +515,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                     int currentRadius = radiusBar.getProgress();
                     String finalRadius = String.valueOf(currentRadius);
                     firestoreUserViewModel.updateRadius(userUid, finalRadius);
-                    mapFragment.onResume();
+                    showMapFragment();
                     dialog.cancel();
 
 

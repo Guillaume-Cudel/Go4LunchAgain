@@ -86,7 +86,6 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
         }
 
 
-        //todo add on item (user) click, display the restaurant profil
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -85,8 +85,6 @@ public class WorkmatesFragment extends Fragment {
         adapter.updateWorkmateRestaurantList(workmatesRestaurantsList);
     }
 
-    // todo boucle method to get all restaurants for any users and add them to a list
-
     private void setRestaurantChoosedList(){
         if (workmatesList.size() > 0){
             for (UserFirebase user : workmatesList){

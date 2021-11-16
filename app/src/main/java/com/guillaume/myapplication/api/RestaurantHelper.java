@@ -178,7 +178,6 @@ public class RestaurantHelper {
                 }
                 Restaurant restaurant = new Restaurant();
                 if (value != null && value.exists()){
-                    //DocumentSnapshot document = task.getResult();
                     restaurant = value.toObject(Restaurant.class);
                 }
                 callback.onSuccess(restaurant);
@@ -194,15 +193,18 @@ public class RestaurantHelper {
 
     public static void getUserRestaurantLiked(String placeID, String uid, GetUserRestaurantLikedCallback callback){
         DocumentReference docRef = RestaurantHelper.getUsersRestaurantLikedCollection(placeID).document(uid);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                UserFirebase user = new UserFirebase();
-                if (task.isSuccessful()){
-                    DocumentSnapshot document = task.getResult();
-                    user = document.toObject(UserFirebase.class);
-                }else{
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Listen failed.", error);
                     callback.onError(new Exception());
+                }
+                UserFirebase user = new UserFirebase();
+                if (value != null && value.exists()){
+                    user = value.toObject(UserFirebase.class);
+                }else{
+                    user = null;
                 }
                 callback.onSuccess(user);
             }

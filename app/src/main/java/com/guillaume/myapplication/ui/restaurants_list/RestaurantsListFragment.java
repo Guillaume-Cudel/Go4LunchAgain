@@ -55,18 +55,9 @@ public class RestaurantsListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //navActivity = (NavigationActivity) getActivity();
-
         loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
         mFirestoreRestaurantVM = Injection.provideFirestoreRestaurantViewModel(getActivity());
 
-        recoveLocation();
-
-
-        double latitude = mLatlng.latitude;
-        double longitude = mLatlng.longitude;
-        String locationText = latitude + "," + longitude;
-        Log.d("localisation", locationText);
 
         mFirestoreRestaurantVM.getAllRestaurants().observe(getActivity(), new Observer<List<Restaurant>>() {
             @Override
@@ -79,6 +70,7 @@ public class RestaurantsListFragment extends Fragment {
         });
 
         configureRecyclerView();
+        recoveLocation();
 
     }
 

@@ -99,7 +99,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mFirestoreRestaurantVM = Injection.provideFirestoreRestaurantViewModel(getActivity());
         mFirestoreUserVM = Injection.provideFirestoreUserViewModel(getActivity());
         //initLocationviewModel();
-        recoveRadius();
+        //recoveRadius();
 
         mapFragment = SupportMapFragment.newInstance();
         mapFragment.getMapAsync(this);
@@ -107,6 +107,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        recoveRadius();
+    }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -140,6 +145,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         map.setMyLocationEnabled(true);
         map.setOnMyLocationButtonClickListener(this);
         map.setOnInfoWindowClickListener(this);
+        recoveRadius();
     }
 
     private void initLocationviewModel() {
@@ -290,17 +296,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
             }
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //todo get info to navigation activity --- test it
-        recoveRadius();
-        //initLocationviewModel();
-        //markRestaurantsFromDatabase();
-        //recoveRestaurantsFromDatabase();
-
     }
 
 

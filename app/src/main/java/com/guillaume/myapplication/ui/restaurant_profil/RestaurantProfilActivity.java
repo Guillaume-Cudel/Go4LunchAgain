@@ -49,6 +49,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
     @NonNull
     private List<UserFirebase> participantslist = new ArrayList<>();
     private UserFirebase mCurrentUser = null;
+    private UserFirebase mUserLikeRestaurant;
 
     private Restaurant mRestaurant = null;
     private RecyclerView recyclerView;
@@ -72,7 +73,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-
         configureView();
         recoveData();
         setFieldsWithData();
@@ -89,7 +89,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                         }
                     }
                 });
-
 
         choosedButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,21 +109,64 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         configureRecyclerView();
     }
 
-    private void updateLike() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getParticipantsList();
+        getCurrentuser();
+        verifyLikeButton();
+    }
+
+    private void getParticipantsList(){
+        fRestaurantViewModel.getParticipantsList(placeID)
+                .observe(this, new Observer<List<UserFirebase>>() {
+                    @Override
+                    public void onChanged(List<UserFirebase> userFirebases) {
+                        RestaurantProfilActivity.this.participantslist.clear();
+                        RestaurantProfilActivity.this.participantslist.addAll(userFirebases);
+                        updateParticipants();
+                    }
+                });
+    }
+
+    private void getCurrentuser(){
+        fUserViewModel.getUser(userUid).observe(this, new Observer<UserFirebase>() {
+            @Override
+            public void onChanged(UserFirebase userFirebase) {
+                mCurrentUser = userFirebase;
+                String restaurantID = mCurrentUser.getRestaurantChoosed();
+
+                // fix bug
+                choosedButton.setImageResource(R.drawable.ic_go);
+                if (placeID.equals(restaurantID)) {
+                    choosedButton.setImageResource(R.drawable.ic_validated);
+                }
+            }
+        });
+    }
+
+    private void verifyLikeButton() {
         fRestaurantViewModel.getUserRestaurantLiked(placeID, userUid).observe(RestaurantProfilActivity.this, new Observer<UserFirebase>() {
             @Override
             public void onChanged(UserFirebase userFirebase) {
-                if (userFirebase == null) {
-                    fRestaurantViewModel.createUserRestaurantLiked(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
+                mUserLikeRestaurant = userFirebase;
+                if (mUserLikeRestaurant != null) {
                     likeImage.setImageResource(R.drawable.ic_baseline_star_rate);
                     likeText.setText(R.string.likeTextRestaurantProfilValidate);
                 } else {
-                    fRestaurantViewModel.deleteUserLiked(placeID, mCurrentUser.getUid());
                     likeImage.setImageResource(R.drawable.ic_baseline_star_border);
                     likeText.setText(R.string.likeTextRestaurantProfilInvalidate);
                 }
             }
         });
+    }
+
+    private void updateLike() {
+        if (mUserLikeRestaurant == null) {
+            fRestaurantViewModel.createUserRestaurantLiked(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
+        } else {
+            fRestaurantViewModel.deleteUserLiked(placeID, mCurrentUser.getUid());
+        }
     }
 
     private void configureView() {
@@ -143,35 +185,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.profil_restaurant_recyclerView);
         fUserViewModel = Injection.provideFirestoreUserViewModel(this);
         fRestaurantViewModel = Injection.provideFirestoreRestaurantViewModel(this);
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        fRestaurantViewModel.getParticipantsList(placeID)
-                .observe(this, new Observer<List<UserFirebase>>() {
-                    @Override
-                    public void onChanged(List<UserFirebase> userFirebases) {
-                        RestaurantProfilActivity.this.participantslist.clear();
-                        RestaurantProfilActivity.this.participantslist.addAll(userFirebases);
-                        updateParticipants();
-                    }
-                });
-
-        fUserViewModel.getUser(userUid).observe(this, new Observer<UserFirebase>() {
-            @Override
-            public void onChanged(UserFirebase userFirebase) {
-                mCurrentUser = userFirebase;
-                String restaurantID = mCurrentUser.getRestaurantChoosed();
-
-                // fix bug
-                choosedButton.setImageResource(R.drawable.ic_go);
-                if (placeID.equals(restaurantID)) {
-                    choosedButton.setImageResource(R.drawable.ic_validated);
-                }
-            }
-        });
     }
 
     private void configureRecyclerView() {
@@ -225,10 +238,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
-
 
     private void recoveData() {
         Bundle i = getIntent().getExtras();
@@ -368,7 +378,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
-        //todo test the below line
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
@@ -408,8 +417,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browse);
     }
-
-
 }
 
 
