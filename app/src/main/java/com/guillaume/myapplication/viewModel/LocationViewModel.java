@@ -9,9 +9,13 @@ import com.google.android.gms.maps.model.LatLng;
 public class LocationViewModel extends ViewModel {
 
     private final MutableLiveData<LatLng> _locationLiveData = new MutableLiveData<>();
+    private MutableLiveData<String> _refreshLiveData = new MutableLiveData<>();
     public LiveData<LatLng> locationLiveData = _locationLiveData;
+    public LiveData<String> refreshLiveData = _refreshLiveData;
+
 
     private LatLng mLocation;
+    private String mRefresh;
 
 
     public void setLocation(double latitude, double longitude) {
@@ -21,6 +25,11 @@ public class LocationViewModel extends ViewModel {
 
     public LatLng getLocation() {
         return mLocation;
+    }
+
+    public void refreshMap(String refresh){
+        this.mRefresh = refresh;
+        _refreshLiveData.postValue(mRefresh);
     }
 
 }

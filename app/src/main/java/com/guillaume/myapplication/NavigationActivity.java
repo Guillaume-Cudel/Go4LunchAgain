@@ -304,7 +304,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         }
 
 
-        //startTransactionFragment(fragmentMap);
+        startTransactionFragment(fragmentMap);
     }
 
     private void showRestaurantsListFragment() {
@@ -512,6 +512,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                     String finalRadius = String.valueOf(currentRadius);
                     firestoreUserViewModel.updateRadius(userUid, finalRadius);
                     showMapFragment();
+                    //locationViewModel.refreshMap(finalRadius);
                     dialog.cancel();
 
 

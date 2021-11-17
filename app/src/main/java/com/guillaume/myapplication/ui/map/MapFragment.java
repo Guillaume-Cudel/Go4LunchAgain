@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -105,6 +106,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapFragment = SupportMapFragment.newInstance();
         mapFragment.getMapAsync(this);
         getChildFragmentManager().beginTransaction().replace(R.id.map_fragment, mapFragment).commit();
+        //refreshMap();
     }
 
     @Override
@@ -125,7 +127,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         if (mLatlng != null) {
             plotBlueDot();
-            recoveRestaurantsFromPlace(mLatlng.latitude, mLatlng.longitude, mRadius);
         }
 
         // verify permission
@@ -140,6 +141,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         map.setOnMyLocationButtonClickListener(this);
         map.setOnInfoWindowClickListener(this);
         recoveRadius();
+    }
+
+    private void refreshMap() {
+        locationViewModel.refreshLiveData.observe(getActivity(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                recoveRadius();
+            }
+        });
     }
 
     private void initLocationviewModel() {
@@ -207,7 +217,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                 isSaved = true;
                             }
                         }
-                        if(!isSaved){
+                        if (!isSaved) {
                             addRestaurantsToDatabase(restaurant.getPlace_id(), photoData, photoWidth, restaurant.getName(), restaurant.getVicinity(),
                                     type, rate, restaurant.getGeometry(), restaurant.getDetails(), restaurant.getOpening_hours());
                         }
@@ -227,6 +237,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void markRestaurantsFromDatabase() {
+        int radius = Integer.parseInt(mRadius);
         if (restaurantsList.size() > 0) {
 
             for (int i = 0; i < restaurantsSaved.size(); i++) {
@@ -238,15 +249,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 } else {
                     infoRate = "No rating";
                 }
-                if (restaurant.getParticipantsNumber() > 0) {
-                    setGreenMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
-                } else {
-                    setRedMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
+
+                int distance = displayRestaurantsWithinRange(restaurantLocation);
+                if (distance < radius) {
+                    if (restaurant.getParticipantsNumber() > 0) {
+                        setGreenMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
+                    } else
+                        setRedMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
+
                 }
             }
             loading.cancel();
 
         }
+    }
+
+    private int displayRestaurantsWithinRange(LatLng restaurantLocation) {
+        double currentLatitude = mLatlng.latitude;
+        double currentLongitude = mLatlng.longitude;
+
+        Location loc1 = new Location("");
+        loc1.setLatitude(currentLatitude);
+        loc1.setLongitude(currentLongitude);
+
+        Location loc2 = new Location("");
+        loc2.setLatitude(restaurantLocation.latitude);
+        loc2.setLongitude(restaurantLocation.longitude);
+
+        float distanceInMeters = loc1.distanceTo(loc2);
+        int distanceRound = (int) distanceInMeters;
+
+        return distanceRound;
     }
 
     private void setRedMarkers(LatLng location, String title, String rate, Restaurant restaurant) {
