@@ -210,7 +210,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                     if (mCurrentUser.getRestaurantChoosed() == null) {
                         addParticipant = true;
                         fUserViewModel.updateRestaurantChoosed(mCurrentUser.getUid(), placeID);
-                        fUserViewModel.updateRestaurantName(mCurrentUser.getUid(), name);
+                        fUserViewModel.updateFieldRestaurantName(mCurrentUser.getUid(), name);
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
@@ -222,7 +222,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                         fRestaurantViewModel.deleteParticipant(mCurrentUser.getRestaurantChoosed(), mCurrentUser.getUid());
                         fUserViewModel.deleteRestaurant(mCurrentUser.getUid(), mCurrentUser.getRestaurantChoosed());
                         fUserViewModel.updateRestaurantChoosed(mCurrentUser.getUid(), placeID);
-                        fUserViewModel.updateRestaurantName(mCurrentUser.getUid(), name);
+                        fUserViewModel.updateFieldRestaurantName(mCurrentUser.getUid(), name);
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);

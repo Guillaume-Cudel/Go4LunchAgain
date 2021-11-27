@@ -150,7 +150,7 @@ public class UserHelper {
         UserHelper.getUsersCollection().document(uid).update(RESTAURANT_CHOOSED_FIELD, restaurantChoosed);
     }
 
-    public static void updateRestaurantName(String uid, String restaurantName){
+    public static void updateShieldRestaurantName(String uid, String restaurantName){
         UserHelper.getUsersCollection().document(uid).update(RESTAURANT_NAME_FIELD, restaurantName);
     }
 

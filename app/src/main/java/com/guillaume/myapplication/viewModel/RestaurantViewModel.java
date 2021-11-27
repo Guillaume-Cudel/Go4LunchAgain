@@ -17,7 +17,6 @@ public class RestaurantViewModel extends ViewModel {
     private static final String FIELDS = "formatted_phone_number,opening_hours,website";
     private MutableLiveData<List<Restaurant>> restaurantListLiveData;
     private MutableLiveData<Details> detailsLiveData;
-    private MutableLiveData<Restaurant> searchingLiveData;
 
 
     private final RestaurantRepository restaurantRepository;
@@ -69,23 +68,6 @@ public class RestaurantViewModel extends ViewModel {
                 detailsLiveData.postValue(null);
             }
         });
-    }
-
-    public LiveData<Restaurant> getSearchingRestaurant(String input){
-        searchingLiveData = new MutableLiveData<Restaurant>();
-
-        restaurantRepository.getSearchingRestaurant(input, API_KEY, new RestaurantRepository.GetSearchingCallback() {
-            @Override
-            public void onSuccess(Restaurant restaurant) {
-                searchingLiveData.postValue(restaurant);
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                searchingLiveData.postValue(null);
-            }
-        });
-        return searchingLiveData;
     }
 }
 

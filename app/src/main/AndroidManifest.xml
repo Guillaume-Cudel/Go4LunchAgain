@@ -66,14 +66,6 @@
             </intent-filter>
         </activity>-->
 
-        <activity android:name=".SearchActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-        </activity>
-
         <activity
             android:name=".NavigationActivity"
             android:screenOrientation="portrait"

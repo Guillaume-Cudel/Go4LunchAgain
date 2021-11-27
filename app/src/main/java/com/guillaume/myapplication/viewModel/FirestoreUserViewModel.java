@@ -5,18 +5,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.guillaume.myapplication.api.UserHelper;
-import com.guillaume.myapplication.model.Details;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
-import com.guillaume.myapplication.model.requests.Geometry;
-import com.guillaume.myapplication.model.requests.OpeningHours;
-import com.firebase.ui.auth.data.model.User;
 
 import java.util.List;
 
 public class FirestoreUserViewModel extends ViewModel {
-
-    private MutableLiveData<List<UserFirebase>> usersListLiveData;
 
     private List<UserFirebase> workmates;
     private UserFirebase mUser;
@@ -28,27 +22,26 @@ public class FirestoreUserViewModel extends ViewModel {
     }
 
     public void createRestaurant(String uid, String placeID, String photoData, String photoWidth, String name,
-                                 String vicinity, String type, String rating){
+                                 String vicinity, String type, String rating) {
         UserHelper.createRestaurant(uid, placeID, photoData, photoWidth, name,
                 vicinity, type, rating);
     }
 
     public LiveData<List<UserFirebase>> getWorkmatesList() {
-        if (usersListLiveData == null) {
-            usersListLiveData = new MutableLiveData<List<UserFirebase>>();
-            UserHelper.getAllUsers(new UserHelper.GetUsersListCallback() {
-                @Override
-                public void onSuccess(List<UserFirebase> list) {
-                    workmates = list;
-                    usersListLiveData.postValue(workmates);
-                }
+        MutableLiveData<List<UserFirebase>> usersListLiveData = new MutableLiveData<List<UserFirebase>>();
+        UserHelper.getAllUsers(new UserHelper.GetUsersListCallback() {
+            @Override
+            public void onSuccess(List<UserFirebase> list) {
+                workmates = list;
+                usersListLiveData.postValue(workmates);
+            }
 
-                @Override
-                public void onError(Exception exception) {
-                    usersListLiveData.postValue(null);
-                }
-            });
-        }
+            @Override
+            public void onError(Exception exception) {
+                usersListLiveData.postValue(null);
+            }
+        });
+
         return usersListLiveData;
     }
 
@@ -72,7 +65,7 @@ public class FirestoreUserViewModel extends ViewModel {
         return getUserLiveData;
     }
 
-    public LiveData<Restaurant> getRestaurant(String uid, String placeID){
+    public LiveData<Restaurant> getRestaurant(String uid, String placeID) {
 
         MutableLiveData<Restaurant> getRestaurantLiveData = new MutableLiveData<Restaurant>();
         UserHelper.getRestaurant(uid, placeID, new UserHelper.GetRestaurantCallback() {
@@ -94,12 +87,12 @@ public class FirestoreUserViewModel extends ViewModel {
         UserHelper.updateRestaurantChoosed(uid, restaurantChoosed);
     }
 
-    public void updateRestaurantName(String uid, String restaurantName) {
+    public void updateFieldRestaurantName(String uid, String restaurantName) {
         //todo put a live data and set up it
-        UserHelper.updateRestaurantName(uid, restaurantName);
+        UserHelper.updateShieldRestaurantName(uid, restaurantName);
     }
-    
-    public void updateRadius(String uid, String currentRadius){
+
+    public void updateRadius(String uid, String currentRadius) {
         UserHelper.updateRadius(uid, currentRadius);
     }
 
@@ -111,7 +104,7 @@ public class FirestoreUserViewModel extends ViewModel {
         UserHelper.deleteRestaurantname(uid);
     }
 
-    public void deleteRestaurant(String uid, String placeID){
+    public void deleteRestaurant(String uid, String placeID) {
         UserHelper.deleteRestaurant(uid, placeID);
     }
 }

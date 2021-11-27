@@ -72,14 +72,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private BottomNavigationView mBottomNavigationView;
     private LocationViewModel locationViewModel;
     private FirestoreUserViewModel firestoreUserViewModel;
-    private FirestoreRestaurantViewModel firestoreRestaurantViewModel;
     private MapFragment mapFragment;
     private LocationCallback locationCallback;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private FirebaseUser authUser = mAuth.getCurrentUser();
-    private String userUid = authUser.getUid();
+    private final FirebaseUser currentUser = this.getCurrentUser();
     private UserFirebase mCurrentUser;
-    private Restaurant mRestaurant;
     private int mRadius;
 
     public Fragment fragmentMap;
@@ -112,8 +108,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
         locationViewModel = Injection.provideLocationViewModel(this);
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
-        firestoreRestaurantViewModel = Injection.provideFirestoreRestaurantViewModel(this);
-
 
         // Show the first fragment when starting activity
         fragmentMap = new MapFragment();
@@ -133,14 +127,13 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
         updateUIWhenCreating();
         onClickItemsDrawer();
-
-
+        setCurrentUser();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        firestoreUserViewModel.getUser(userUid).observe(this, new Observer<UserFirebase>() {
+        firestoreUserViewModel.getUser(currentUser.getUid()).observe(this, new Observer<UserFirebase>() {
             @Override
             public void onChanged(UserFirebase userFirebase) {
                 mCurrentUser = userFirebase;
@@ -159,7 +152,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         TextView profilUsername = (TextView) header.findViewById(R.id.profil_name);
         TextView profilUsermail = (TextView) header.findViewById(R.id.profil_mail);
 
-        FirebaseUser currentUser = this.getCurrentUser();
         if (currentUser != null) {
 
             //Get picture URL from Firebase
@@ -198,14 +190,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
-
         return true;
     }
 
@@ -238,10 +222,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 showRestaurantChoosed();
                 break;
             case R.id.nav_settings:
-                mapFragment.onPause();
                 openSettings();
                 break;
             case R.id.nav_log_out:
+                //todo verify this
                 FirebaseAuth.getInstance().signOut();
                 finish();
                 break;
@@ -293,7 +277,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             fragmentMap = MapFragment.newInstance();
             startTransactionFragment(fragmentMap);
             return;
-        }else {
+        }/*else {
             // Refresh your fragment here
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.detach(fragmentMap);
@@ -301,9 +285,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             transaction.commitAllowingStateLoss();
             startTransactionFragment(fragmentMap);
             Log.w("IsRefresh", "Yes");
-        }
-
-
+        }*/
         startTransactionFragment(fragmentMap);
     }
 
@@ -407,30 +389,30 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     }
 
     private void showRestaurantChoosed() {
-        firestoreUserViewModel.getRestaurant(mCurrentUser.getUid(), mCurrentUser.getRestaurantChoosed()).observe(this, new Observer<Restaurant>() {
-            @Override
-            public void onChanged(Restaurant restaurant) {
-                mRestaurant = restaurant;
-                if (mRestaurant == null) {
-                    Toast.makeText(NavigationActivity.this, R.string.NavigationChooseRestaurant, Toast.LENGTH_LONG).show();
-                } else {
+        if (mCurrentUser.getRestaurantChoosed() == null) {
+            Toast.makeText(NavigationActivity.this, R.string.NavigationChooseRestaurant, Toast.LENGTH_LONG).show();
+            //todo put alertdialog instead Toast
+        } else {
+            firestoreUserViewModel.getRestaurant(mCurrentUser.getUid(), mCurrentUser.getRestaurantChoosed()).observe(this, new Observer<Restaurant>() {
+                @Override
+                public void onChanged(Restaurant restaurant) {
                     Intent i = new Intent(NavigationActivity.this, RestaurantProfilActivity.class);
-                    i.putExtra("place_id", mRestaurant.getPlace_id());
-                    i.putExtra("name", mRestaurant.getName());
-                    i.putExtra("photo", mRestaurant.getPhotoReference());
-                    i.putExtra("photoWidth", mRestaurant.getPhotoWidth());
-                    i.putExtra("vicinity", mRestaurant.getVicinity());
-                    i.putExtra("type", mRestaurant.getType());
-                    i.putExtra("rate", mRestaurant.getRating());
+                    i.putExtra("place_id", restaurant.getPlace_id());
+                    i.putExtra("name", restaurant.getName());
+                    i.putExtra("photo", restaurant.getPhotoReference());
+                    i.putExtra("photoWidth", restaurant.getPhotoWidth());
+                    i.putExtra("vicinity", restaurant.getVicinity());
+                    i.putExtra("type", restaurant.getType());
+                    i.putExtra("rate", restaurant.getRating());
                     startActivity(i);
+
                 }
-            }
-        });
+            });
+        }
 
     }
 
     private void openSettings() {
-
         if (mCurrentUser != null) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -507,15 +489,12 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    //todo onClick OK, reload the map --- test it ---- no work
                     int currentRadius = radiusBar.getProgress();
                     String finalRadius = String.valueOf(currentRadius);
-                    firestoreUserViewModel.updateRadius(userUid, finalRadius);
-                    showMapFragment();
-                    //locationViewModel.refreshMap(finalRadius);
+                    firestoreUserViewModel.updateRadius(currentUser.getUid(), finalRadius);
+                    //showMapFragment();
+                    locationViewModel.refreshMap(finalRadius);
                     dialog.cancel();
-
-
                 }
             });
 
@@ -524,6 +503,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             AlertDialog dialog = builder.create();
             dialog.show();
         }
+    }
+
+    private void setCurrentUser() {
+        locationViewModel.setCurrentUser(currentUser);
     }
 
 

@@ -100,13 +100,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mRestaurantVM = Injection.provideRestaurantViewModel(getActivity());
         mFirestoreRestaurantVM = Injection.provideFirestoreRestaurantViewModel(getActivity());
         mFirestoreUserVM = Injection.provideFirestoreUserViewModel(getActivity());
-        //initLocationviewModel();
-        //recoveRadius();
 
         mapFragment = SupportMapFragment.newInstance();
         mapFragment.getMapAsync(this);
         getChildFragmentManager().beginTransaction().replace(R.id.map_fragment, mapFragment).commit();
-        //refreshMap();
+        refreshMap();
     }
 
     @Override
@@ -144,7 +142,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void refreshMap() {
-        locationViewModel.refreshLiveData.observe(getActivity(), new Observer<String>() {
+        locationViewModel.refreshLiveData.observe(requireActivity(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 recoveRadius();
@@ -153,16 +151,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void initLocationviewModel() {
-        if (navActivity != null) {
-            locationViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
-                @Override
-                public void onChanged(LatLng latLng) {
-                    mLatlng = latLng;
-                    plotBlueDot();
-                    recoveRestaurantsFromDatabase();
-                }
-            });
-        }
+        locationViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
+            @Override
+            public void onChanged(LatLng latLng) {
+                mLatlng = latLng;
+                plotBlueDot();
+                recoveRestaurantsFromDatabase();
+            }
+        });
     }
 
     public void recoveRadius() {
@@ -197,7 +193,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     MapFragment.this.restaurantsList.addAll(restaurants);
 
                     for (int i = 0; i < restaurantsList.size(); i++) {
-                        boolean isSaved = false;
                         Restaurant restaurant = restaurantsList.get(i);
                         String rate = null;
                         String type = restaurant.getTypes().get(0);
@@ -213,13 +208,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                             photoWidth = photoInformation.get(0).getWidth();
                         }
                         for (Restaurant r : restaurantsSaved) {
-                            if (r.getPlace_id().equals(restaurant.getPlace_id())) {
-                                isSaved = true;
+                            if (!r.getPlace_id().equals(restaurant.getPlace_id())) {
+                                addRestaurantsToDatabase(restaurant.getPlace_id(), photoData, photoWidth, restaurant.getName(), restaurant.getVicinity(),
+                                        type, rate, restaurant.getGeometry(), restaurant.getDetails(), restaurant.getOpening_hours());
                             }
-                        }
-                        if (!isSaved) {
-                            addRestaurantsToDatabase(restaurant.getPlace_id(), photoData, photoWidth, restaurant.getName(), restaurant.getVicinity(),
-                                    type, rate, restaurant.getGeometry(), restaurant.getDetails(), restaurant.getOpening_hours());
                         }
                     }
                     markRestaurantsFromDatabase();
@@ -231,7 +223,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private void addRestaurantsToDatabase(String placeID, String photoData, String photoWidth, String name, String vicinity,
                                           String type, String rating, Geometry geometry, Details detail, OpeningHours openingHours) {
-
         mFirestoreRestaurantVM.createRestaurant(placeID, photoData, photoWidth, name,
                 vicinity, type, rating, geometry, detail, openingHours);
     }
@@ -254,13 +245,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 if (distance < radius) {
                     if (restaurant.getParticipantsNumber() > 0) {
                         setGreenMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
-                    } else
+                    } else {
                         setRedMarkers(restaurantLocation, restaurant.getName(), infoRate, restaurant);
-
+                    }
                 }
             }
             loading.cancel();
-
         }
     }
 
