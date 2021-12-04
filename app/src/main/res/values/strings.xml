@@ -17,6 +17,7 @@
     <string name="AUTH_ID">899120232217-l5resnanl78699lve2vkshbsdcgr6sd3.apps.googleusercontent.com</string>
 
 
+    <string name="API_KEY">AIzaSyCfIzqvYUkoerRn0a3nnUsLcpooxnZElxI</string>
     <string name="success">Authentification success</string>
     <string name="canceled">Authentification canceled</string>
     <string name="error">There is an error to the authentification process</string>

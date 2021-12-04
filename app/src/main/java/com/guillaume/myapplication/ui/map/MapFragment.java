@@ -1,5 +1,7 @@
 package com.guillaume.myapplication.ui.map;
 
+import static pub.devrel.easypermissions.RationaleDialogFragment.TAG;
+
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,9 +13,14 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +32,14 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.guillaume.myapplication.NavigationActivity;
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.model.Details;
@@ -75,6 +90,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private FirebaseUser authUser = mAuth.getCurrentUser();
     private String userUid = authUser.getUid();
     private String mRadius;
+    private PlacesClient placesClient;
 
 
     public static MapFragment newInstance() {
@@ -85,8 +101,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         View view = inflater.inflate(R.layout.fragment_map, container, false);
+        Places.initialize(requireActivity(), getResources().getString(R.string.API_KEY));
+        placesClient = Places.createClient(requireActivity());
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -377,5 +395,63 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         double rLongitude = Double.parseDouble(restaurantLongitude);
 
         return new LatLng(rLatitude, rLongitude);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.option_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setQueryHint("Search restaurants !");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchWithText(newText);
+
+                //todo at the end return true
+                return true;
+            }
+        });
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    private void searchWithText(String query){
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+        RectangularBounds bounds = RectangularBounds.newInstance(
+                new LatLng(43.566584, 1.365717),
+                new LatLng(43.677297, 1.504212));
+
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                .setLocationBias(bounds)
+                .setOrigin(mLatlng)
+                .setCountries("FR")
+                //todo test setTypeFilter
+                .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                .setSessionToken(token)
+                .setQuery(query)
+                .build();
+
+        placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
+            for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+                Log.i(TAG, prediction.getPlaceId());
+                Log.i(TAG, prediction.getPrimaryText(null).toString());
+                Log.i(TAG, prediction.getDistanceMeters().toString());
+            }
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+            }
+        });
+
+
     }
 }

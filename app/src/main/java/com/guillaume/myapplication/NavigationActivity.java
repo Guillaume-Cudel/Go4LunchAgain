@@ -185,13 +185,13 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
     // ACTION
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
 
         return true;
-    }
+    }*/
 
     private void onClickItemsDrawer() {
         NavigationView navView = binding.navigationDrawerNavView;
