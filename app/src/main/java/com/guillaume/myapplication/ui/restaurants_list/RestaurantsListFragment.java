@@ -66,6 +66,8 @@ public class RestaurantsListFragment extends Fragment {
         mFirestoreRestaurantVM = Injection.provideFirestoreRestaurantViewModel(getActivity());
         mFirestoreUserVM = Injection.provideFirestoreUserViewModel(getActivity());
 
+
+        recoveLocation();
         recoveRadius();
         configureRecyclerView();
 
@@ -82,37 +84,36 @@ public class RestaurantsListFragment extends Fragment {
     }
 
     private void recoveAllRestaurants(){
-            mFirestoreRestaurantVM.getAllRestaurants().observe(requireActivity(), new Observer<List<Restaurant>>() {
-                @Override
-                public void onChanged(List<Restaurant> restaurants) {
-                    RestaurantsListFragment.this.restaurantsList.clear();
-                    RestaurantsListFragment.this.restaurantsList.addAll(restaurants);
-                    filterRestaurantsWithinReach();
-                    updateRestaurants();
-                    loading.cancel();
-                }
-            });
+        mFirestoreRestaurantVM.getAllRestaurants().observe(getActivity(), new Observer<List<Restaurant>>() {
+            @Override
+            public void onChanged(List<Restaurant> restaurants) {
+                RestaurantsListFragment.this.restaurantsList.clear();
+                RestaurantsListFragment.this.restaurantsList.addAll(restaurants);
+                filterRestaurantsWithinReach();
+                updateRestaurants();
+                loading.cancel();
+            }
+        });
     }
 
     private void recoveRadius(){
-        mFirestoreUserVM.getUser(authUser.getUid()).observe(requireActivity(), new Observer<UserFirebase>() {
+        mFirestoreUserVM.getUser(authUser.getUid()).observe(getActivity(), new Observer<UserFirebase>() {
             @Override
             public void onChanged(UserFirebase userFirebase) {
                 mRadius = userFirebase.getCurrentRadius();
-                recoveLocation();
+                recoveAllRestaurants();
             }
         });
     }
 
     private void recoveLocation(){
 
-        LocationViewModel locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
+        LocationViewModel locationViewModel = new ViewModelProvider(getActivity()).get(LocationViewModel.class);
         locationViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
             @Override
             public void onChanged(LatLng latLng) {
                 mLatlng = latLng;
                 updateLocation();
-                recoveAllRestaurants();
             }
         });
     }

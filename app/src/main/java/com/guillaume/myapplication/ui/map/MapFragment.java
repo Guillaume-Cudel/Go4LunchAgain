@@ -168,6 +168,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         });
     }
 
+    public void recoveRadius() {
+        mFirestoreUserVM.getUser(userUid).observe(requireActivity(), new Observer<UserFirebase>() {
+            @Override
+            public void onChanged(UserFirebase user) {
+                mRadius = user.getCurrentRadius();
+                initLocationviewModel();
+            }
+        });
+    }
+
     private void initLocationviewModel() {
         locationViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
             @Override
@@ -175,16 +185,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 mLatlng = latLng;
                 plotBlueDot();
                 recoveRestaurantsFromDatabase();
-            }
-        });
-    }
-
-    public void recoveRadius() {
-        mFirestoreUserVM.getUser(userUid).observe(requireActivity(), new Observer<UserFirebase>() {
-            @Override
-            public void onChanged(UserFirebase user) {
-                mRadius = user.getCurrentRadius();
-                initLocationviewModel();
             }
         });
     }
@@ -211,6 +211,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     MapFragment.this.restaurantsList.addAll(restaurants);
 
                     for (int i = 0; i < restaurantsList.size(); i++) {
+                        boolean isSaved = false;
                         Restaurant restaurant = restaurantsList.get(i);
                         String rate = null;
                         String type = restaurant.getTypes().get(0);
@@ -225,8 +226,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                             photoData = photoInformation.get(0).getPhotoReference();
                             photoWidth = photoInformation.get(0).getWidth();
                         }
-                        for (Restaurant r : restaurantsSaved) {
-                            if (!r.getPlace_id().equals(restaurant.getPlace_id())) {
+                        if(restaurantsSaved.size() > 0) {
+                            for (Restaurant r : restaurantsSaved) {
+                                if (r.getPlace_id().equals(restaurant.getPlace_id())) {
+                                    isSaved = true;
+                                    break;
+                                }
+                            }
+                            if (!isSaved) {
                                 addRestaurantsToDatabase(restaurant.getPlace_id(), photoData, photoWidth, restaurant.getName(), restaurant.getVicinity(),
                                         type, rate, restaurant.getGeometry(), restaurant.getDetails(), restaurant.getOpening_hours());
                             }
@@ -419,6 +426,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         });
 
+        //Option to suggest restaurants
+        searchView.setQueryRefinementEnabled(true);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -426,14 +436,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private void searchWithText(String query){
         AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
         RectangularBounds bounds = RectangularBounds.newInstance(
-                new LatLng(43.566584, 1.365717),
-                new LatLng(43.677297, 1.504212));
+                new LatLng(43.642033, 1.410652),
+                new LatLng(43.664141, 1.466528));
 
         FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
                 .setLocationBias(bounds)
                 .setOrigin(mLatlng)
                 .setCountries("FR")
-                //todo test setTypeFilter
+                //todo see if setTypeFilter always display the restaurants
                 .setTypeFilter(TypeFilter.ESTABLISHMENT)
                 .setSessionToken(token)
                 .setQuery(query)
