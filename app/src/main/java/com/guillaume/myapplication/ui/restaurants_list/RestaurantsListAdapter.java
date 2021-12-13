@@ -99,6 +99,9 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
             String intConvert = String.valueOf(participants);
             String participantsText = "(" + intConvert + ")";
             holder.participantsField.setText(participantsText);
+        }else{
+            holder.participantsIcon.setVisibility(View.INVISIBLE);
+            holder.participantsField.setVisibility(View.INVISIBLE);
         }
         
 
@@ -166,6 +169,7 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
         private final TextView informationField;
         private final TextView openingTime;
         private final TextView distanceField;
+        private final ImageView participantsIcon;
         private final TextView participantsField;
         private final ImageView noteField1;
         private final ImageView noteField2;
@@ -182,6 +186,7 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
             informationField = mView.findViewById(R.id.list_view_informations);
             openingTime = mView.findViewById(R.id.list_view_opening_time);
             distanceField = mView.findViewById(R.id.list_view_distance);
+            participantsIcon = mView.findViewById(R.id.list_view_workmates_image);
             participantsField = mView.findViewById(R.id.list_view_number_workmates);
             noteField1 = mView.findViewById(R.id.list_view_star_1);
             noteField2 = mView.findViewById(R.id.list_view_star_2);

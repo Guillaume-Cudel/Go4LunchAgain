@@ -4,13 +4,16 @@ import static pub.devrel.easypermissions.RationaleDialogFragment.TAG;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,6 +50,7 @@ import com.guillaume.myapplication.model.Details;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
 import com.guillaume.myapplication.model.requests.Geometry;
 import com.guillaume.myapplication.model.requests.OpeningHours;
+import com.guillaume.myapplication.search.CustomSearchProvider;
 import com.guillaume.myapplication.ui.restaurant_profil.RestaurantProfilActivity;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
@@ -209,6 +214,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 public void onChanged(List<Restaurant> restaurants) {
                     MapFragment.this.restaurantsList.clear();
                     MapFragment.this.restaurantsList.addAll(restaurants);
+                    locationViewModel.setCurrentRestaurantsDisplayed(restaurantsList);
 
                     for (int i = 0; i < restaurantsList.size(); i++) {
                         boolean isSaved = false;
@@ -404,12 +410,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return new LatLng(rLatitude, rLongitude);
     }
 
-    @Override
+    /*@Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.option_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setQueryHint("Search restaurants !");
+        searchView.setIconifiedByDefault(false);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -419,7 +426,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchWithText(newText);
+                //searchWithText(newText);
 
                 //todo at the end return true
                 return true;
@@ -430,7 +437,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         searchView.setQueryRefinementEnabled(true);
 
         super.onCreateOptionsMenu(menu, inflater);
-    }
+    }*/
 
 
     private void searchWithText(String query){
@@ -454,6 +461,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 Log.i(TAG, prediction.getPlaceId());
                 Log.i(TAG, prediction.getPrimaryText(null).toString());
                 Log.i(TAG, prediction.getDistanceMeters().toString());
+                //todo display data
             }
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
@@ -461,7 +469,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 Log.e(TAG, "Place not found: " + apiException.getStatusCode());
             }
         });
-
-
     }
+
 }

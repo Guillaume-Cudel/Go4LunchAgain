@@ -3,6 +3,7 @@
 <searchable xmlns:android="http://schemas.android.com/apk/res/android"
     android:label="@string/app_name"
     android:hint="@string/search_hint"
-    android:searchSuggestAuthority="com.guillaume.myapplication"
+    android:searchSuggestAuthority="com.guillaume.myapplication.provider"
     android:searchSuggestIntentAction="android.intent.action.VIEW"
+    android:searchSuggestIntentData="content://com.guillaume.myapplication.provider/restaurant"
     android:searchSuggestSelection="word MATCH ?"/>

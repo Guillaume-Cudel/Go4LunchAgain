@@ -1,5 +1,7 @@
 package com.guillaume.myapplication;
 
+import static pub.devrel.easypermissions.RationaleDialogFragment.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -39,6 +41,15 @@ import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.guillaume.myapplication.databinding.ActivityNavigationBinding;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
@@ -66,7 +77,7 @@ import com.google.firebase.auth.FirebaseUser;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class NavigationActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class NavigationActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
 
     private ActivityNavigationBinding binding;
     private BottomNavigationView mBottomNavigationView;
@@ -76,7 +87,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private LocationCallback locationCallback;
     private final FirebaseUser currentUser = this.getCurrentUser();
     private UserFirebase mCurrentUser;
-    private int mRadius;
+    private int mRadius, id;
+    private PlacesClient placesClient;
 
     public Fragment fragmentMap;
     public Fragment fragmentRestaurantsList;
@@ -103,6 +115,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        //todo test it
+        Places.initialize(this, getResources().getString(R.string.API_KEY));
+        placesClient = Places.createClient(this);
+
 
         mBottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_bottom_nav_view);
 
@@ -124,6 +140,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         binding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+
+        handleSearchIntent();
+
 
         updateUIWhenCreating();
         onClickItemsDrawer();
@@ -185,13 +204,22 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
     // ACTION
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.search);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setQueryHint("Search restaurants !");
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false);
+        searchView.setOnQueryTextListener(this);
+
 
         return true;
-    }*/
+    }
 
     private void onClickItemsDrawer() {
         NavigationView navView = binding.navigationDrawerNavView;
@@ -213,7 +241,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     public boolean onNavigationItemSelected(MenuItem item) {
 
         //  Handle Navigation Item Click
-        int id = item.getItemId();
+        id = item.getItemId();
         item.setChecked(true);
         binding.drawerLayout.closeDrawers();
 
@@ -249,6 +277,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
         return true;
     }
+
+    
 
     // VIEW
 
@@ -509,5 +539,53 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         locationViewModel.setCurrentUser(currentUser);
     }
 
+    private void handleSearchIntent(){
+        Intent intent = getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //doMySearch(query);
+        }
+    }
 
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        doMySearch(newText);
+        return false;
+    }
+
+    private void doMySearch(String query){
+        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+        RectangularBounds bounds = RectangularBounds.newInstance(
+                new LatLng(43.642033, 1.410652),
+                new LatLng(43.664141, 1.466528));
+
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                .setLocationBias(bounds)
+                //.setOrigin(mLatlng)
+                .setCountries("FR")
+                //todo see if setTypeFilter always display the restaurants
+                .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                .setSessionToken(token)
+                .setQuery(query)
+                .build();
+
+        placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
+            for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+                Log.i(TAG, prediction.getPlaceId());
+                Log.i(TAG, prediction.getPrimaryText(null).toString());
+                //Log.i(TAG, prediction.getDistanceMeters().toString());
+                //todo display data
+            }
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+            }
+        });
+    }
 }

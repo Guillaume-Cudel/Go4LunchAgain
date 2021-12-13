@@ -17,6 +17,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4Lunch">
 
+       <!-- <provider
+            android:name="com.guillaume.myapplication.search.CustomSearchProvider"
+            android:authorities="com.guillaume.myapplication.search.CustomSearchProvider"
+            android:enabled="true"
+            android:exported="false" />-->
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCfIzqvYUkoerRn0a3nnUsLcpooxnZElxI" />
@@ -62,29 +68,29 @@
             </intent-filter>
         </activity>
         -->
-        <activity android:name=".search.SearchableActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
 
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+
+        <activity android:name=".search.SearchableActivity">
+            <meta-data android:name="android.app.default_searchable"
+                android:value=".NavigationActivity" />
         </activity>
 
         <activity
             android:name=".ui.restaurant_profil.RestaurantProfilActivity"
-            android:screenOrientation="portrait" /> <!-- todo check this code -->
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".NavigationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.app.searchable"
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

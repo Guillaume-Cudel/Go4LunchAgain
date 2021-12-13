@@ -3,8 +3,12 @@ package com.guillaume.myapplication.ui.workmates;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,6 +46,7 @@ public class WorkmatesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_workmates, container, false);
+        setHasOptionsMenu(true);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_workmates_list);
         mFirestoreUserVM = Injection.provideFirestoreUserViewModel(requireActivity());
@@ -105,5 +110,11 @@ public class WorkmatesFragment extends Fragment {
     public void onResume() {
         super.onResume();
         setRestaurantChoosedList();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.findItem(R.id.search).setVisible(false);
     }
 }
