@@ -85,7 +85,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private FirebaseUser authUser = mAuth.getCurrentUser();
     private String userUid = authUser.getUid();
     private String mRadius;
-    private PlacesClient placesClient;
 
 
     public static MapFragment newInstance() {
@@ -97,9 +96,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                              ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_map, container, false);
-        Places.initialize(requireActivity(), getResources().getString(R.string.API_KEY));
-        placesClient = Places.createClient(requireActivity());
-        setHasOptionsMenu(true);
         return view;
     }
 
@@ -389,7 +385,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         return bitmap;
     }
-
 
     private LatLng recoveLatLng(Restaurant r) {
         String restaurantLatitude = r.getGeometry().getLocation().getLat();

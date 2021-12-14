@@ -91,12 +91,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private BottomNavigationView mBottomNavigationView;
     private LocationViewModel locationViewModel;
     private FirestoreUserViewModel firestoreUserViewModel;
-    private MapFragment mapFragment;
     private LocationCallback locationCallback;
     private final FirebaseUser currentUser = this.getCurrentUser();
     private UserFirebase mCurrentUser;
     private int mRadius, id;
-    private PlacesClient placesClient;
     private SearchView searchView;
     private SuggestionsDatabase database;
     private List<Restaurant> currentRestaurantsDisplayed = new ArrayList<Restaurant>();
@@ -127,11 +125,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         View view = binding.getRoot();
         setContentView(view);
 
-        //todo useless
-        Places.initialize(this, getResources().getString(R.string.API_KEY));
-        placesClient = Places.createClient(this);
-
-
         mBottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_bottom_nav_view);
 
         locationViewModel = Injection.provideLocationViewModel(this);
@@ -140,7 +133,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
         // Show the first fragment when starting activity
         fragmentMap = new MapFragment();
-        mapFragment = new MapFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.nav_host_fragment, fragmentMap);
         fragmentTransaction.commit();
@@ -153,8 +145,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         binding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
-        handleSearchIntent();
 
         updateUIWhenCreating();
         onClickItemsDrawer();
@@ -564,15 +554,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 }
             }
         });
-    }
-
-    private void handleSearchIntent() {
-        // todo test to delete it
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            //doMySearch(query);
-        }
     }
 
     @Override

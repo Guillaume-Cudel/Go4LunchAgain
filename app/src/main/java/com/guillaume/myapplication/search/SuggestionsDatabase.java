@@ -23,29 +23,29 @@ public class SuggestionsDatabase {
         db = helper.getWritableDatabase();
     }
 
-    public long insertSuggestion(String text)
+    public void insertSuggestion(String text)
     {
         ContentValues values = new ContentValues();
         values.put(FIELD_SUGGESTION, text);
-        return db.insert(TABLE_SUGGESTION, null, values);
+        db.insert(TABLE_SUGGESTION, null, values);
     }
 
     public void deleteOldSuggestions(){
         db.delete(TABLE_SUGGESTION, null, null);
     }
 
-    /*public Cursor getSuggestions(String text)
-    {
-        return db.query(TABLE_SUGGESTION, new String[] {FIELD_ID, FIELD_SUGGESTION},
-                FIELD_SUGGESTION+" LIKE '"+ text +"%'", null, null, null, null);
-    }*/
+    public Cursor getSuggestions(String text) {
+        String[] selectionArgs = { text + "%" };
 
-    public Cursor getSuggestions(String text)
-    {
+        return db.query(TABLE_SUGGESTION, new String[] {FIELD_ID, FIELD_SUGGESTION},
+                FIELD_SUGGESTION+" LIKE ?", selectionArgs, null, null, null);
+    }
+
+    /*public Cursor getSuggestions(String text){
         return db.query(TABLE_SUGGESTION, new String[] {FIELD_ID, FIELD_SUGGESTION},
                 FIELD_SUGGESTION + " LIKE " + "'" + text +"%" + "'" ,
                 null, null, null, null);
-    }
+    }*/
 
     private class Helper extends SQLiteOpenHelper
     {
