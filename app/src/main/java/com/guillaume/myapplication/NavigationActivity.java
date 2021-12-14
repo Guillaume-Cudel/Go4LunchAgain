@@ -18,6 +18,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteCursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -54,6 +56,8 @@ import com.guillaume.myapplication.databinding.ActivityNavigationBinding;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
+import com.guillaume.myapplication.search.SuggestionSimpleCursorAdapter;
+import com.guillaume.myapplication.search.SuggestionsDatabase;
 import com.guillaume.myapplication.ui.BaseActivity;
 import com.guillaume.myapplication.ui.map.MapFragment;
 import com.guillaume.myapplication.ui.restaurant_profil.RestaurantProfilActivity;
@@ -74,10 +78,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class NavigationActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
+public class NavigationActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,
+        SearchView.OnQueryTextListener, SearchView.OnSuggestionListener {
 
     private ActivityNavigationBinding binding;
     private BottomNavigationView mBottomNavigationView;
@@ -89,6 +97,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private UserFirebase mCurrentUser;
     private int mRadius, id;
     private PlacesClient placesClient;
+    private SearchView searchView;
+    private SuggestionsDatabase database;
+    private List<Restaurant> currentRestaurantsDisplayed = new ArrayList<Restaurant>();
 
     public Fragment fragmentMap;
     public Fragment fragmentRestaurantsList;
@@ -115,7 +126,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        //todo test it
+
+        //todo useless
         Places.initialize(this, getResources().getString(R.string.API_KEY));
         placesClient = Places.createClient(this);
 
@@ -124,6 +136,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
         locationViewModel = Injection.provideLocationViewModel(this);
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
+        database = new SuggestionsDatabase(this);
 
         // Show the first fragment when starting activity
         fragmentMap = new MapFragment();
@@ -143,7 +156,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
         handleSearchIntent();
 
-
         updateUIWhenCreating();
         onClickItemsDrawer();
         setCurrentUser();
@@ -161,6 +173,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             }
         });
 
+        recoveCurrentRestaurantsDisplayed();
     }
 
     // UI
@@ -210,12 +223,13 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         inflater.inflate(R.menu.option_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.search);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView = (SearchView) menuItem.getActionView();
         searchView.setQueryHint("Search restaurants !");
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
         searchView.setOnQueryTextListener(this);
+        searchView.setOnSuggestionListener(this);
 
 
         return true;
@@ -278,7 +292,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         return true;
     }
 
-    
 
     // VIEW
 
@@ -539,7 +552,22 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         locationViewModel.setCurrentUser(currentUser);
     }
 
-    private void handleSearchIntent(){
+    private void recoveCurrentRestaurantsDisplayed() {
+        locationViewModel.currentRestaurantsDisplayedLiveData.observe(this, new Observer<List<Restaurant>>() {
+            @Override
+            public void onChanged(List<Restaurant> restaurants) {
+                currentRestaurantsDisplayed = restaurants;
+                //todo test delete method
+                database.deleteOldSuggestions();
+                for (Restaurant r : currentRestaurantsDisplayed) {
+                    database.insertSuggestion(r.getName());
+                }
+            }
+        });
+    }
+
+    private void handleSearchIntent() {
+        // todo test to delete it
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
@@ -549,43 +577,70 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        return false;
+        for (Restaurant r : currentRestaurantsDisplayed) {
+            if (query.equals(r.getName())) {
+                displayProfilRestaurant(r);
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        doMySearch(newText);
+
+        Cursor cursor = database.getSuggestions(newText);
+        if (cursor.getCount() != 0) {
+            String[] columns = new String[]{SuggestionsDatabase.FIELD_SUGGESTION};
+            int[] columnTextId = new int[]{android.R.id.text1};
+
+            SuggestionSimpleCursorAdapter simple = new SuggestionSimpleCursorAdapter(getBaseContext(),
+                    android.R.layout.simple_list_item_1, cursor,
+                    columns, columnTextId
+                    , 0);
+
+            searchView.setSuggestionsAdapter(simple);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onSuggestionSelect(int position) {
         return false;
     }
 
-    private void doMySearch(String query){
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-        RectangularBounds bounds = RectangularBounds.newInstance(
-                new LatLng(43.642033, 1.410652),
-                new LatLng(43.664141, 1.466528));
+    @Override
+    public boolean onSuggestionClick(int position) {
+        SQLiteCursor cursor = (SQLiteCursor) searchView.getSuggestionsAdapter().getItem(position);
+        int indexColumnSuggestion = cursor.getColumnIndex(SuggestionsDatabase.FIELD_SUGGESTION);
 
-        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                .setLocationBias(bounds)
-                //.setOrigin(mLatlng)
-                .setCountries("FR")
-                //todo see if setTypeFilter always display the restaurants
-                .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                .setSessionToken(token)
-                .setQuery(query)
-                .build();
+        searchView.setQuery(cursor.getString(indexColumnSuggestion), true);
+        return true;
+    }
 
-        placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
-            for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                Log.i(TAG, prediction.getPlaceId());
-                Log.i(TAG, prediction.getPrimaryText(null).toString());
-                //Log.i(TAG, prediction.getDistanceMeters().toString());
-                //todo display data
-            }
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                ApiException apiException = (ApiException) exception;
-                Log.e(TAG, "Place not found: " + apiException.getStatusCode());
-            }
-        });
+    private void displayProfilRestaurant(Restaurant restaurant){
+        String place_id = restaurant.getPlace_id();
+        String rating = restaurant.getRating();
+        String type = null;
+        String photoData = null;
+        String photoWidth = null;
+        if (restaurant.getTypes() != null) {
+            type = restaurant.getTypes().get(0);
+        }
+
+        Intent i = new Intent(this, RestaurantProfilActivity.class);
+        i.putExtra("place_id", place_id);
+        i.putExtra("name", restaurant.getName());
+        if (restaurant.getPhotoReference() != null) {
+            photoData = restaurant.getPhotoReference();
+            photoWidth = restaurant.getPhotoWidth();
+        }
+        i.putExtra("photo", photoData);
+        i.putExtra("photoWidth", photoWidth);
+        i.putExtra("vicinity", restaurant.getVicinity());
+        i.putExtra("type", type);
+        i.putExtra("rate", rating);
+        startActivity(i);
     }
 }

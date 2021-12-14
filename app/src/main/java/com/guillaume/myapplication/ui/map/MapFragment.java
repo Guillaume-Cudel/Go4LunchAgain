@@ -4,27 +4,19 @@ import static pub.devrel.easypermissions.RationaleDialogFragment.TAG;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,7 +24,6 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -50,7 +41,6 @@ import com.guillaume.myapplication.model.Details;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
 import com.guillaume.myapplication.model.requests.Geometry;
 import com.guillaume.myapplication.model.requests.OpeningHours;
-import com.guillaume.myapplication.search.CustomSearchProvider;
 import com.guillaume.myapplication.ui.restaurant_profil.RestaurantProfilActivity;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
@@ -409,66 +399,4 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         return new LatLng(rLatitude, rLongitude);
     }
-
-    /*@Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.option_menu, menu);
-        MenuItem menuItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) menuItem.getActionView();
-        searchView.setQueryHint("Search restaurants !");
-        searchView.setIconifiedByDefault(false);
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                //searchWithText(newText);
-
-                //todo at the end return true
-                return true;
-            }
-        });
-
-        //Option to suggest restaurants
-        searchView.setQueryRefinementEnabled(true);
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }*/
-
-
-    private void searchWithText(String query){
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-        RectangularBounds bounds = RectangularBounds.newInstance(
-                new LatLng(43.642033, 1.410652),
-                new LatLng(43.664141, 1.466528));
-
-        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                .setLocationBias(bounds)
-                .setOrigin(mLatlng)
-                .setCountries("FR")
-                //todo see if setTypeFilter always display the restaurants
-                .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                .setSessionToken(token)
-                .setQuery(query)
-                .build();
-
-        placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
-            for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                Log.i(TAG, prediction.getPlaceId());
-                Log.i(TAG, prediction.getPrimaryText(null).toString());
-                Log.i(TAG, prediction.getDistanceMeters().toString());
-                //todo display data
-            }
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                ApiException apiException = (ApiException) exception;
-                Log.e(TAG, "Place not found: " + apiException.getStatusCode());
-            }
-        });
-    }
-
 }

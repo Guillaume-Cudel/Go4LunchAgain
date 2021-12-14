@@ -70,11 +70,6 @@
         -->
 
 
-        <activity android:name=".search.SearchableActivity">
-            <meta-data android:name="android.app.default_searchable"
-                android:value=".NavigationActivity" />
-        </activity>
-
         <activity
             android:name=".ui.restaurant_profil.RestaurantProfilActivity"
             android:screenOrientation="portrait" />
