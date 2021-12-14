@@ -556,6 +556,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         });
     }
 
+
     @Override
     public boolean onQueryTextSubmit(String query) {
         for (Restaurant r : currentRestaurantsDisplayed) {
@@ -575,7 +576,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             int[] columnTextId = new int[]{android.R.id.text1};
 
             SuggestionSimpleCursorAdapter simple = new SuggestionSimpleCursorAdapter(getBaseContext(),
-                    android.R.layout.simple_list_item_1, cursor,
+                    R.layout.listview_item, cursor,
                     columns, columnTextId
                     , 0);
 

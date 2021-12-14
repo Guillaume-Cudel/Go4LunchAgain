@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.2824074074074074" />
+        <entry key="../../Library/Android/sdk/platforms/android-30/data/res/layout/simple_list_item_1.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/activity_navigation.xml" value="0.14895833333333333" />
         <entry key="app/src/main/res/layout/activity_searchable.xml" value="0.165" />
