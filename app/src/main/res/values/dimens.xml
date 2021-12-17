@@ -10,4 +10,6 @@
     <dimen name="margin_start">20dp</dimen>
     <dimen name="ten">10dp</dimen>
     <dimen name="five">5dp</dimen>
+    <dimen name="thirteen">13sp</dimen>
+    <dimen name="eight_text_size">8sp</dimen>
 </resources>

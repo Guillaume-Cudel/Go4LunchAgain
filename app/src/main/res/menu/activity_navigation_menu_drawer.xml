@@ -8,6 +8,10 @@
                 android:id="@+id/nav_your_lunch"
                 android:icon="@drawable/ic_menu_restaurant"
                 android:title="@string/your_lunch" />
+
+            <item android:id="@+id/workmates_chat"
+                android:icon="@drawable/ic_baseline_chat_bubble"
+                android:title="@string/workmates_chat"/>
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@drawable/ic_menu_settings"

@@ -39,5 +39,9 @@
     <string name="search_title">search</string>
     <string name="search_hint">Look for a restaurant</string>
     <string name="wormateNoChooseRestaurant">This workmate doesn\'t have choose a restaurant yet</string>
+    <string name="workmates_chat">Workmates chat</string>
+    <string name="compose_your_message">Compose your message</string>
+    <string name="send">Send</string>
+    <string name="workmates_chat_string">Wormates chat</string>
 
 </resources>

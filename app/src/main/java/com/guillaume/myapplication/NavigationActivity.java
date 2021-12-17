@@ -1,7 +1,5 @@
 package com.guillaume.myapplication;
 
-import static pub.devrel.easypermissions.RationaleDialogFragment.TAG;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -12,7 +10,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 
 import android.Manifest;
-import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,10 +19,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,15 +38,6 @@ import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.guillaume.myapplication.databinding.ActivityNavigationBinding;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
@@ -59,11 +45,11 @@ import com.guillaume.myapplication.model.firestore.UserFirebase;
 import com.guillaume.myapplication.search.SuggestionSimpleCursorAdapter;
 import com.guillaume.myapplication.search.SuggestionsDatabase;
 import com.guillaume.myapplication.ui.BaseActivity;
+import com.guillaume.myapplication.ui.chat.ChatActivity;
 import com.guillaume.myapplication.ui.map.MapFragment;
 import com.guillaume.myapplication.ui.restaurant_profil.RestaurantProfilActivity;
 import com.guillaume.myapplication.ui.restaurants_list.RestaurantsListFragment;
 import com.guillaume.myapplication.ui.workmates.WorkmatesFragment;
-import com.guillaume.myapplication.viewModel.FirestoreRestaurantViewModel;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
 import com.guillaume.myapplication.viewModel.LocationViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -253,6 +239,11 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             case R.id.nav_your_lunch:
                 showRestaurantChoosed();
                 break;
+
+            case R.id.workmates_chat:
+                openChatActivity();
+                break;
+
             case R.id.nav_settings:
                 openSettings();
                 break;
@@ -623,6 +614,11 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         i.putExtra("vicinity", restaurant.getVicinity());
         i.putExtra("type", type);
         i.putExtra("rate", rating);
+        startActivity(i);
+    }
+
+    private void openChatActivity(){
+        Intent i = new Intent(this, ChatActivity.class);
         startActivity(i);
     }
 }
