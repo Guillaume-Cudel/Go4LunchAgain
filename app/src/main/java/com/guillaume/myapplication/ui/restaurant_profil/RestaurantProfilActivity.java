@@ -14,6 +14,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -70,8 +72,9 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profil_restaurant);
 
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null){
+            actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FF9C1A")));
+            actionBar.setDisplayHomeAsUpEnabled(true);}
 
         configureView();
         recoveData();

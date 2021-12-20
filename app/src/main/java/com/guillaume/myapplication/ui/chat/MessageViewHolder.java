@@ -32,11 +32,9 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     private final TextView dateTextView;
     private final ImageView profileImage;
     private final ImageView senderImageView;
-    // todo a test
-    private final RelativeLayout messageTextContainer;
+    private final LinearLayout messageTextContainer;
     private final LinearLayout profileContainer;
-    //todo test
-    private final RelativeLayout messageContainer;
+    private final LinearLayout messageContainer;
 
     private final int colorCurrentUser;
     private final int colorRemoteUser;
@@ -48,15 +46,13 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         this.isSender = isSender;
         //binding = ItemChatBinding.bind(itemView);
 
-        messageTextView = itemView.findViewById(R.id.activity_chat_item_message_container_text_message_container_text_view);
-        dateTextView = itemView.findViewById(R.id.activity_chat_item_message_container_text_view_date);
-        profileImage = itemView.findViewById(R.id.activity_chat_item_profile_container_profile_image);
-        senderImageView = itemView.findViewById(R.id.activity_chat_item_message_container_image_sent_cardview_image);
-        //todo test it
-        messageTextContainer = itemView.findViewById(R.id.activity_chat_item_message_container_text_message_container);
-        profileContainer = itemView.findViewById(R.id.activity_chat_item_profile_container);
-        //todo test it
-        messageContainer = itemView.findViewById(R.id.activity_chat_item_message_container);
+        messageTextView = itemView.findViewById(R.id.messageTextView);
+        dateTextView = itemView.findViewById(R.id.dateTextView);
+        profileImage = itemView.findViewById(R.id.profileImage);
+        senderImageView = itemView.findViewById(R.id.senderImageView);
+        messageTextContainer = itemView.findViewById(R.id.messageTextContainer);
+        profileContainer = itemView.findViewById(R.id.profileContainer);
+        messageContainer = itemView.findViewById(R.id.messageContainer);
 
 
         // Setup default colors
@@ -73,16 +69,16 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         messageTextView.setTextAlignment(isSender ? View.TEXT_ALIGNMENT_TEXT_END : View.TEXT_ALIGNMENT_TEXT_START);
         // Update date
         //if (message.getDateCreated() != null) binding.dateTextView.setText(this.convertDateToHour(message.getDateCreated()));
-        if (message.getDateCreated() != null)
-            dateTextView.setText(this.convertDateToHour(message.getDateCreated()));
+        if (message.getDateCreated() != null){
+            dateTextView.setText(this.convertDateToHour(message.getDateCreated()));}
 
 
         // Update profile picture
-        if (message.getUserSender().getUrlPicture() != null)
+        if (message.getUserSender().getUrlPicture() != null){
             glide.load(message.getUserSender().getUrlPicture())
                     .apply(RequestOptions.circleCropTransform())
                     //.into(binding.profileImage);
-                    .into(profileImage);
+                    .into(profileImage);}
 
         // Update image sent
         if (message.getUrlImage() != null) {

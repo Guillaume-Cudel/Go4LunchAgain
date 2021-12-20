@@ -1,19 +1,27 @@
 package com.guillaume.myapplication.ui.chat;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.Query;
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.model.firestore.MessageFirebase;
-import com.guillaume.myapplication.repository.ChatManager;
+import com.guillaume.myapplication.manager.ChatManager;
 import com.guillaume.myapplication.ui.BaseActivity;
 
 public class ChatActivity extends BaseActivity implements ChatAdapter.Listener {
@@ -21,6 +29,8 @@ public class ChatActivity extends BaseActivity implements ChatAdapter.Listener {
     private ChatAdapter chatAdapter;
     private RecyclerView chatRecyclerView;
     private TextView emptyRecyclerView;
+    private Button sendButton;
+    private EditText chatEditText;
 
     private static final String CHAT_NAME = "Workmates chat";
 
@@ -41,21 +51,32 @@ public class ChatActivity extends BaseActivity implements ChatAdapter.Listener {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_chat);
-        //setupListeners();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FF9C1A")));
+            actionBar.setDisplayHomeAsUpEnabled(true);}
+
         chatRecyclerView = findViewById(R.id.activity_chat_recycler_view);
         emptyRecyclerView = findViewById(R.id.activity_chat_text_view_recycler_view_empty);
+        sendButton = findViewById(R.id.activity_chat_send_button);
+        chatEditText = findViewById(R.id.activity_chat_message_edit_text);
+
         configureRecyclerView();
+        setupListeners();
     }
 
 
 
-    /*private void setupListeners(){
+    private void setupListeners(){
 
         // Chat buttons
-        binding.androidChatButton.setOnClickListener(view -> { this.configureRecyclerView(CHAT_NAME_ANDROID); });
+        /*binding.androidChatButton.setOnClickListener(view -> { this.configureRecyclerView(CHAT_NAME_ANDROID); });
         binding.firebaseChatButton.setOnClickListener(view -> { this.configureRecyclerView(CHAT_NAME_FIREBASE); });
-        binding.bugChatButton.setOnClickListener(view -> { this.configureRecyclerView(CHAT_NAME_BUG); });
-    }*/
+        binding.bugChatButton.setOnClickListener(view -> { this.configureRecyclerView(CHAT_NAME_BUG); });*/
+
+        sendButton.setOnClickListener(view -> {sendMessage();});
+
+    }
 
     // Configure RecyclerView
     private void configureRecyclerView(){
@@ -90,6 +111,23 @@ public class ChatActivity extends BaseActivity implements ChatAdapter.Listener {
         // Show TextView in case RecyclerView is empty
         //binding.emptyRecyclerView.setVisibility(this.chatAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
         emptyRecyclerView.setVisibility(this.chatAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+    }
 
+    private void sendMessage(){
+        // Check if user can send a message (Text not null + user logged)
+        //boolean canSendMessage = !TextUtils.isEmpty(binding.chatEditText.getText()) && userManager.isCurrentUserLogged();
+        boolean canSendMessage = !TextUtils.isEmpty(chatEditText.getText());
+
+
+        if (canSendMessage){
+            // Create a new message for the chat
+            String currentUserName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+            //chatManager.createMessageForChat(binding.chatEditText.getText().toString(), this.currentChatName);
+            chatManager.createMessageForChat(chatEditText.getText().toString(), ChatActivity.CHAT_NAME);
+
+            // Reset text field
+            //binding.chatEditText.setText("");
+            chatEditText.setText("");
+        }
     }
 }

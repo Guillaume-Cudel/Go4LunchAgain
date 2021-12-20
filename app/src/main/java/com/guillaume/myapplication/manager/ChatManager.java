@@ -1,6 +1,7 @@
-package com.guillaume.myapplication.repository;
+package com.guillaume.myapplication.manager;
 
 import com.google.firebase.firestore.Query;
+import com.guillaume.myapplication.repository.ChatRepository;
 
 public class ChatManager {
 
@@ -25,6 +26,13 @@ public class ChatManager {
     }
 
     public Query getAllMessageForChat(String chat){
-        return chatRepository.getAllMessageForChat(chat);
+        return chatRepository.getAllMessage(chat);
+    }
+    /*public Query getAllMessageForChat(){
+        return chatRepository.getAllMessage();
+    }*/
+
+    public void createMessageForChat(String message, String chat){
+        chatRepository.createMessageForChat(message, chat);
     }
 }

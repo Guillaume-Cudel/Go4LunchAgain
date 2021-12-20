@@ -1,5 +1,7 @@
 package com.guillaume.myapplication.model.firestore;
 
+import com.google.firebase.firestore.ServerTimestamp;
+
 import java.util.Date;
 
 public class MessageFirebase {
@@ -24,7 +26,7 @@ public class MessageFirebase {
 
     // --- GETTERS ---
     public String getMessage() { return message; }
-    //@ServerTimestamp
+    @ServerTimestamp
     public Date getDateCreated() { return dateCreated; }
     public UserFirebase getUserSender() { return userSender; }
     public String getUrlImage() { return urlImage; }

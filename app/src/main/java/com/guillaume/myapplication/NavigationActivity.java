@@ -38,6 +38,7 @@ import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.firebase.ui.auth.AuthUI;
 import com.guillaume.myapplication.databinding.ActivityNavigationBinding;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
@@ -140,14 +141,16 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     @Override
     protected void onResume() {
         super.onResume();
-        firestoreUserViewModel.getUser(currentUser.getUid()).observe(this, new Observer<UserFirebase>() {
-            @Override
-            public void onChanged(UserFirebase userFirebase) {
-                mCurrentUser = userFirebase;
-                String radiusString = userFirebase.getCurrentRadius();
-                mRadius = Integer.parseInt(radiusString);
-            }
-        });
+        if(currentUser != null) {
+            firestoreUserViewModel.getUser(currentUser.getUid()).observe(this, new Observer<UserFirebase>() {
+                @Override
+                public void onChanged(UserFirebase userFirebase) {
+                    mCurrentUser = userFirebase;
+                    String radiusString = userFirebase.getCurrentRadius();
+                    mRadius = Integer.parseInt(radiusString);
+                }
+            });
+        }
 
         recoveCurrentRestaurantsDisplayed();
     }
@@ -207,7 +210,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         searchView.setOnQueryTextListener(this);
         searchView.setOnSuggestionListener(this);
 
-
         return true;
     }
 
@@ -249,8 +251,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 break;
             case R.id.nav_log_out:
                 //todo verify this
-                FirebaseAuth.getInstance().signOut();
+                //FirebaseAuth.getInstance().signOut();
                 finish();
+                AuthUI.getInstance().signOut(this);
                 break;
 
             case R.id.navigation_map:

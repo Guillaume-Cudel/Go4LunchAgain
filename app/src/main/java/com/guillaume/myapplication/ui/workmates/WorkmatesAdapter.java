@@ -67,8 +67,6 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
         }
 
         String username = user.getUsername();
-
-
         String restaurantName = user.getRestaurantName();
         if(restaurantName != null){
 
@@ -78,7 +76,9 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
             String workmateEating = username + " is eating.";
             String restaurantText = "(" + restaurantName + ")";
             holder.usernameText.setText(workmateEating);
+            holder.usernameText.setTextColor(Color.BLACK);
             holder.restaurantText.setText(restaurantText);
+            holder.restaurantText.setTextColor(Color.BLACK);
         }else {
             String restaurantLess = username + " hasn't decided yet.";
             holder.usernameText.setText(restaurantLess);
