@@ -41,11 +41,6 @@ public final class ChatRepository {
                 .orderBy("dateCreated")
                 .limit(50);
     }
-    /*public Query getAllMessage(){
-        return this.getChatCollection()
-                .orderBy("dateCreated")
-                .limit(50);
-    }*/
 
     public void createMessageForChat(String textMessage, String chat){
         userManager.getUserData().addOnSuccessListener(user -> {
@@ -59,17 +54,4 @@ public final class ChatRepository {
                     .add(message);
         });
     }
-    /*public void createMessageForChat(String textMessage){
-        //todo check the problem
-        userManager.getUserData().addOnSuccessListener(user -> {
-            // Create the Message object
-            MessageFirebase message = new MessageFirebase(textMessage, user);
-
-            // Store Message to Firestore
-            this.getChatCollection()
-                    //.document(chat)
-                    //.collection(MESSAGE_COLLECTION)
-                    .add(message);
-        });
-    }*/
 }

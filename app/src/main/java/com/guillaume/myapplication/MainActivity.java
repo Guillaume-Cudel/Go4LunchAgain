@@ -241,7 +241,6 @@ public class MainActivity extends BaseActivity {
 
     private void createUserInFirestore() {
 
-        //todo verify and get user in the view model and not here
         //todo verify the user in the database before adding
         if (isCurrentUserLogged()) {
             String urlPicture = (getCurrentUser().getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;

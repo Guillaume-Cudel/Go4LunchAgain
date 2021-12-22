@@ -44,4 +44,8 @@
     <string name="send">Send</string>
     <string name="workmates_chat_string">Wormates chat</string>
 
+    // Notification
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+
+
 </resources>

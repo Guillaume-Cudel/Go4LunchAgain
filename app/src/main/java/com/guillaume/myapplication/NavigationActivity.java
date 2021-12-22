@@ -541,7 +541,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             @Override
             public void onChanged(List<Restaurant> restaurants) {
                 currentRestaurantsDisplayed = restaurants;
-                //todo test delete method
                 database.deleteOldSuggestions();
                 for (Restaurant r : currentRestaurantsDisplayed) {
                     database.insertSuggestion(r.getName());
@@ -549,7 +548,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             }
         });
     }
-
 
     @Override
     public boolean onQueryTextSubmit(String query) {

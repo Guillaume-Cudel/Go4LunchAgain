@@ -107,7 +107,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
+        //loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
         navActivity = (NavigationActivity) getActivity();
         locationViewModel = new ViewModelProvider(navActivity).get(LocationViewModel.class);
         mRestaurantVM = Injection.provideRestaurantViewModel(getActivity());
@@ -151,14 +151,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         map.setMyLocationEnabled(true);
         map.setOnMyLocationButtonClickListener(this);
         map.setOnInfoWindowClickListener(this);
-        recoveRadius();
+        if(userUid != null) {
+            recoveRadius();
+        }
     }
 
     private void refreshMap() {
         locationViewModel.refreshLiveData.observe(requireActivity(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
-                recoveRadius();
+                if(userUid != null) {
+                    recoveRadius();
+                }
             }
         });
     }
@@ -271,7 +275,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     }
                 }
             }
-            loading.cancel();
+            //loading.cancel();
         }
     }
 
