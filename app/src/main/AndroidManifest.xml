@@ -17,13 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4Lunch">
 
-        <!--
-         <provider
-            android:name="com.guillaume.myapplication.search.CustomSearchProvider"
-            android:authorities="com.guillaume.myapplication.search.CustomSearchProvider"
-            android:enabled="true"
-            android:exported="false" />
-        -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCfIzqvYUkoerRn0a3nnUsLcpooxnZElxI" />
@@ -100,14 +93,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- NOTIFICATION SERVICE -->
-        <service
-            android:name=".notification.NotificationsService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
 
     </application>
 

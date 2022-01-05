@@ -420,6 +420,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browse);
     }
+
 }
 
 
