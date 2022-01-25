@@ -1,6 +1,10 @@
 package com.guillaume.myapplication.ui.restaurant_profil;
 
+import static com.guillaume.myapplication.R.string.notification_actived;
+import static com.guillaume.myapplication.R.string.notification_canceled;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,8 +12,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.WorkManager;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,13 +25,16 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.guillaume.myapplication.NavigationActivity;
@@ -32,6 +43,7 @@ import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Details;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
+import com.guillaume.myapplication.notification.AlarmReceiver;
 import com.guillaume.myapplication.viewModel.FirestoreRestaurantViewModel;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,6 +51,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class RestaurantProfilActivity extends AppCompatActivity {
@@ -47,6 +60,9 @@ public class RestaurantProfilActivity extends AppCompatActivity {
     private TextView nameText, typeText, vicinityText, likeText;
     private ImageView restaurantPhoto, star1, star2, star3, callImage, likeImage, websiteImage;
     private FloatingActionButton choosedButton;
+    private final String workID = "notificationWorkID";
+    private PendingIntent alarmIntent;
+    private WorkManager mWorkManager;
 
     @NonNull
     private List<UserFirebase> participantslist = new ArrayList<>();
@@ -79,6 +95,11 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         configureView();
         recoveData();
         setFieldsWithData();
+
+        mWorkManager = WorkManager.getInstance(this);
+
+        Intent intent = new Intent(RestaurantProfilActivity.this, AlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(RestaurantProfilActivity.this, 0, intent, 0);
 
         Injection.provideRestaurantViewModel(this).getDetails(placeID)
                 .observe(this, new Observer<Details>() {
@@ -206,6 +227,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
     private void updateList() {
 
         fRestaurantViewModel.getUser(placeID, userUid).observe(RestaurantProfilActivity.this, new Observer<UserFirebase>() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onChanged(UserFirebase userFirebase) {
                 if (mCurrentUser != null) {
@@ -217,6 +239,8 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
+                        cancelNotification();
+                        startAlarm();
 
                     } else if (!mCurrentUser.getRestaurantChoosed().equals(placeID)) {
                         addParticipant = true;
@@ -229,6 +253,8 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
+                        cancelNotification();
+                        startAlarm();
 
                     } else {
                         addParticipant = false;
@@ -237,6 +263,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                         fUserViewModel.deleteRestaurant(mCurrentUser.getUid(), placeID);
                         fRestaurantViewModel.deleteParticipant(placeID, mCurrentUser.getUid());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
+                        cancelNotification();
                     }
                 }
             }
@@ -421,6 +448,31 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         startActivity(browse);
     }
 
+
+    @SuppressLint("LongLogTag")
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void startAlarm() {
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 11);
+        calendar.set(Calendar.MINUTE, 59);
+
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+        //alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), alarmIntent), alarmIntent);
+        Log.e("RestaurantProfilActivity", "SetExact alarm launched");
+        Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
+    }
+
+    private void cancelNotification(){
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        // Work cancel
+        mWorkManager.cancelAllWorkByTag(workID);
+        // Alarm cancel
+        manager.cancel(alarmIntent);
+        //Toast.makeText(this, notification_canceled, Toast.LENGTH_LONG).show();
+    }
 }
 
 

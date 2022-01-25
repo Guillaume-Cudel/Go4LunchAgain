@@ -46,6 +46,8 @@
 
     // Notification
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="notification_actived">Notification Actived</string>
+    <string name="notification_canceled">Notification canceled</string>
 
 
 </resources>

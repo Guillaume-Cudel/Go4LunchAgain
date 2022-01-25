@@ -7,6 +7,7 @@
         <entry key="../../Library/Android/sdk/platforms/android-30/data/res/layout/simple_list_item_1.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/drawable/button_radius_primary_color.xml" value="0.27870370370370373" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_circle.xml" value="0.27870370370370373" />
+        <entry key="app/src/main/res/drawable/ic_baseline_rice_bowl.xml" value="0.27685185185185185" />
         <entry key="app/src/main/res/drawable/ic_chat_message_background.xml" value="0.27870370370370373" />
         <entry key="app/src/main/res/layout/activity_chat.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_chat_item.xml" value="0.29322916666666665" />
