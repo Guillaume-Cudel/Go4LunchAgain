@@ -41,12 +41,6 @@ public class SuggestionsDatabase {
                 FIELD_SUGGESTION+" LIKE ?", selectionArgs, null, null, null);
     }
 
-    /*public Cursor getSuggestions(String text){
-        return db.query(TABLE_SUGGESTION, new String[] {FIELD_ID, FIELD_SUGGESTION},
-                FIELD_SUGGESTION + " LIKE " + "'" + text +"%" + "'" ,
-                null, null, null, null);
-    }*/
-
     private class Helper extends SQLiteOpenHelper
     {
 

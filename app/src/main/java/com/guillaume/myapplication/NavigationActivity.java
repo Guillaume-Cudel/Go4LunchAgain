@@ -43,6 +43,7 @@ import com.guillaume.myapplication.databinding.ActivityNavigationBinding;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
+import com.guillaume.myapplication.model.requests.Photos;
 import com.guillaume.myapplication.search.SuggestionSimpleCursorAdapter;
 import com.guillaume.myapplication.search.SuggestionsDatabase;
 import com.guillaume.myapplication.ui.BaseActivity;
@@ -536,6 +537,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         locationViewModel.setCurrentUser(currentUser);
     }
 
+    //todo fix bug with photo and search
     private void recoveCurrentRestaurantsDisplayed() {
         locationViewModel.currentRestaurantsDisplayedLiveData.observe(this, new Observer<List<Restaurant>>() {
             @Override
@@ -606,9 +608,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         Intent i = new Intent(this, RestaurantProfilActivity.class);
         i.putExtra("place_id", place_id);
         i.putExtra("name", restaurant.getName());
-        if (restaurant.getPhotoReference() != null) {
-            photoData = restaurant.getPhotoReference();
-            photoWidth = restaurant.getPhotoWidth();
+        if (restaurant.getPhotos() != null) {
+            Photos restaurantPhoto = restaurant.getPhotos().get(0);
+            photoData = restaurantPhoto.getPhotoReference();
+            photoWidth = restaurantPhoto.getWidth();
         }
         i.putExtra("photo", photoData);
         i.putExtra("photoWidth", photoWidth);
