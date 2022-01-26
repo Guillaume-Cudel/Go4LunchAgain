@@ -28,15 +28,14 @@ public class AlarmReceiver extends BroadcastReceiver {
         //todo put the good work request after the test
         applyNotification();
         //applyNotificationPeriodically();
-        //applyPeriodicallyInMinutes();
     }
 
     private void applyNotification() {
-        //mWorkManager.enqueue(OneTimeWorkRequest.from(NotificationWorker.class));
+        mWorkManager.enqueue(OneTimeWorkRequest.from(NotificationWorker.class));
 
-        mWorkManager.enqueue(new OneTimeWorkRequest.Builder(NotificationWorker.class)
+        /*mWorkManager.enqueue(new OneTimeWorkRequest.Builder(NotificationWorker.class)
                 .setInitialDelay(1, TimeUnit.MINUTES)
-                .build());
+                .build());*/
     }
 
     private void applyNotificationPeriodically() {
@@ -45,14 +44,5 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .addTag(workID)
                 .build());
         Log.e(TAG, "Send notification all days");
-    }
-
-    private void applyPeriodicallyInMinutes() {
-        //mWorkManager.enqueue(new PeriodicWorkRequest.Builder(NotificationWorker.class, 1, TimeUnit.MINUTES).build());
-        mWorkManager.enqueue(new PeriodicWorkRequest.Builder(NotificationWorker.class, 1, TimeUnit.MINUTES)
-                //.setInitialDelay(2, TimeUnit.MINUTES)
-                .addTag(workID)
-                .build());
-        Log.e(TAG, "Send notification all mins");
     }
 }

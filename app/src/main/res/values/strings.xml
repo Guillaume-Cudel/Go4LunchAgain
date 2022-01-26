@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Go4LunchAgain</string>
+    <string name="app_name">Go4Lunch</string>
     <string name="title_map">Map view</string>
     <string name="title_restaurants_list">List view</string>
     <string name="title_workmates">Workmates</string>

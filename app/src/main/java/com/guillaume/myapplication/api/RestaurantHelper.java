@@ -57,18 +57,7 @@ public class RestaurantHelper {
     public static void createRestaurant(String placeID, String photoData, String photoWidth, String name,
                                         String vicinity, String type, String rating, Geometry geometry, Details detail, OpeningHours openingHours) {
         Restaurant restaurantToCreate = new Restaurant(placeID, photoData, photoWidth, name, vicinity, type, rating, geometry, detail, openingHours);
-        RestaurantHelper.getRestaurantsCollection().document(placeID).set(restaurantToCreate).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                e.printStackTrace();
-            }
-        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-
-            }
-        });
-
+        RestaurantHelper.getRestaurantsCollection().document(placeID).set(restaurantToCreate);
     }
 
     public static void createRestaurantUser(String placeID, String uid, String username, String urlPicture) {

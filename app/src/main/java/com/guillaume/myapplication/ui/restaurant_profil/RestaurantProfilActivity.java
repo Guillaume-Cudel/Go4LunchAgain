@@ -49,6 +49,7 @@ import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.guillaume.myapplication.viewModel.RestaurantViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -75,6 +76,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
     private Context context;
     private FirestoreUserViewModel fUserViewModel;
     private FirestoreRestaurantViewModel fRestaurantViewModel;
+    private RestaurantViewModel restaurantVM;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser currentUser = mAuth.getCurrentUser();
     private String userUid = currentUser.getUid();
@@ -209,6 +211,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.profil_restaurant_recyclerView);
         fUserViewModel = Injection.provideFirestoreUserViewModel(this);
         fRestaurantViewModel = Injection.provideFirestoreRestaurantViewModel(this);
+        restaurantVM = Injection.provideRestaurantViewModel(this);
     }
 
     private void configureRecyclerView() {
@@ -470,7 +473,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         // Work cancel
         mWorkManager.cancelAllWorkByTag(workID);
         // Alarm cancel
-        manager.cancel(alarmIntent);
+        //manager.cancel(alarmIntent);
         //Toast.makeText(this, notification_canceled, Toast.LENGTH_LONG).show();
     }
 }
