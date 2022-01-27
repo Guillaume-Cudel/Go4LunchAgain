@@ -50,6 +50,7 @@ public class NotificationWorker extends Worker {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser authUser = mAuth.getCurrentUser();
     private String userID = authUser.getUid();
+    private final String TAG = "NotificationWorker";
 
 
     public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -61,35 +62,23 @@ public class NotificationWorker extends Worker {
     public Result doWork() {
         Context applicationContext = getApplicationContext();
 
-        if (mRestaurant != null) {
-            sendNotification(applicationContext);
+        try {
+            recoveUserData(userID, applicationContext);
             return Result.success();
-        }else{
-            recoveUserData(userID);
-            recoveRestaurantData(restaurantID);
-            recoveAllWorkmates(restaurantID);
+        } catch (Throwable throwable) {
+            Log.e(TAG, "Error applying notification", throwable);
             return Result.failure();
         }
-
-
-            /*try {
-                sendNotification(applicationContext);
-                return Result.success();
-            } catch (Throwable throwable) {
-                Log.e(TAG, "Error applying notification", throwable);
-                return Result.failure();
-            }*/
-        //}
-
     }
 
-    private void recoveUserData(String userID){
+    private void recoveUserData(String userID, Context context){
         UserHelper.getUser(userID, new UserHelper.GetUserCallback() {
             @Override
             public void onSuccess(UserFirebase user) {
                 currentUser = user;
                 restaurantID = currentUser.getRestaurantChoosed();
-                doWork();
+                recoveRestaurantData(restaurantID);
+                recoveAllWorkmates(restaurantID, context);
             }
 
             @Override
@@ -113,11 +102,12 @@ public class NotificationWorker extends Worker {
         });
     }
 
-    private void recoveAllWorkmates(String restaurantID){
+    private void recoveAllWorkmates(String restaurantID, Context context){
         RestaurantHelper.getAllUsers(restaurantID, new RestaurantHelper.GetAllUsersCallback() {
             @Override
             public void onSuccess(List<UserFirebase> list) {
                 workmates = list;
+                sendNotification(context);
             }
 
             @Override
@@ -155,7 +145,6 @@ public class NotificationWorker extends Worker {
         String restaurantAddress = mRestaurant.getVicinity();
 
         String message = content2 + restaurantName.toUpperCase() + " at " + restaurantAddress + " with " + wNames;
-        String TAG = "NotificationWorker";
         Log.e(TAG, wNames.toString());
 
 

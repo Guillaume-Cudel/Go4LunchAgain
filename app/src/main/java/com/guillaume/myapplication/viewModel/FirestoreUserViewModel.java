@@ -88,8 +88,7 @@ public class FirestoreUserViewModel extends ViewModel {
     }
 
     public void updateFieldRestaurantName(String uid, String restaurantName) {
-        //todo put a live data and set up it
-        UserHelper.updateShieldRestaurantName(uid, restaurantName);
+        UserHelper.updateFieldRestaurantName(uid, restaurantName);
     }
 
     public void updateRadius(String uid, String currentRadius) {

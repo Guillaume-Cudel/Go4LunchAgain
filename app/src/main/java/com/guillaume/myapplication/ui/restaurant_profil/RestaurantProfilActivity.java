@@ -236,16 +236,17 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                 if (mCurrentUser != null) {
                     boolean addParticipant;
                     if (mCurrentUser.getRestaurantChoosed() == null) {
+                        cancelNotification();
                         addParticipant = true;
                         fUserViewModel.updateRestaurantChoosed(mCurrentUser.getUid(), placeID);
                         fUserViewModel.updateFieldRestaurantName(mCurrentUser.getUid(), name);
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
-                        cancelNotification();
                         startAlarm();
 
                     } else if (!mCurrentUser.getRestaurantChoosed().equals(placeID)) {
+                        cancelNotification();
                         addParticipant = true;
                         boolean participantElsewhere = false;
                         fRestaurantViewModel.updateParticipantNumber(mCurrentUser.getRestaurantChoosed(), participantElsewhere);
@@ -256,17 +257,18 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
-                        cancelNotification();
                         startAlarm();
 
                     } else {
+                        cancelNotification();
+                        //todo check it
                         addParticipant = false;
+                        //todo test this method
+                        fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
                         fUserViewModel.deleteRestaurantChoosed(mCurrentUser.getUid());
                         fUserViewModel.deleteRestaurantname(mCurrentUser.getUid());
                         fUserViewModel.deleteRestaurant(mCurrentUser.getUid(), placeID);
                         fRestaurantViewModel.deleteParticipant(placeID, mCurrentUser.getUid());
-                        fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
-                        cancelNotification();
                     }
                 }
             }
@@ -456,6 +458,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void startAlarm() {
 
+        // todo Launch the method from onCreate() of NavigationActivity
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -463,7 +466,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         calendar.set(Calendar.MINUTE, 59);
 
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
-        //alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), alarmIntent), alarmIntent);
         Log.e("RestaurantProfilActivity", "SetExact alarm launched");
         Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
     }
@@ -473,8 +475,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         // Work cancel
         mWorkManager.cancelAllWorkByTag(workID);
         // Alarm cancel
-        //manager.cancel(alarmIntent);
-        //Toast.makeText(this, notification_canceled, Toast.LENGTH_LONG).show();
+        manager.cancel(alarmIntent);
     }
 }
 

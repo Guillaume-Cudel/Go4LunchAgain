@@ -61,7 +61,7 @@ public class WorkmatesFragment extends Fragment {
 
         ProgressDialog loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecoveWorkmates), true);
 
-        Injection.provideFirestoreUserViewModel(getActivity()).getWorkmatesList().observe(this.getActivity(), new Observer<List<UserFirebase>>() {
+        Injection.provideFirestoreUserViewModel(getActivity()).getWorkmatesList().observe(requireActivity(), new Observer<List<UserFirebase>>() {
             @Override
             public void onChanged(List<UserFirebase> users) {
                 WorkmatesFragment.this.workmatesList.clear();

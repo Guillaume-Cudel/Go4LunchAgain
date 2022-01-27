@@ -212,11 +212,18 @@ public class RestaurantHelper {
             public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
                 DocumentSnapshot snapshot = transaction.get(docRef);
                 if(addParticipant) {
-                    double newParticipantNumber = snapshot.getDouble(PARTICIPANTS_NUMBER) +1;
-                    transaction.update(docRef, PARTICIPANTS_NUMBER, newParticipantNumber);
+                    Double participantNumber = snapshot.getDouble(PARTICIPANTS_NUMBER);
+                    if(participantNumber != null){
+                       double newParticipantNumber = participantNumber +1;
+                        transaction.update(docRef, PARTICIPANTS_NUMBER, newParticipantNumber);
+                    }
                 }else{
-                    double newParticipantNumber = snapshot.getDouble(PARTICIPANTS_NUMBER) -1;
-                    transaction.update(docRef, PARTICIPANTS_NUMBER, newParticipantNumber);
+                    //double newParticipantNumber = snapshot.getDouble(PARTICIPANTS_NUMBER) -1;
+                    Double participantNumber = snapshot.getDouble(PARTICIPANTS_NUMBER);
+                    if(participantNumber != null){
+                        double newParticipantNumber = participantNumber -1;
+                        transaction.update(docRef, PARTICIPANTS_NUMBER, newParticipantNumber);
+                    }
                 }
                 return null;
             }

@@ -132,15 +132,15 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
 
         private void getRestaurantChoosed(UserFirebase user){
             if(user.getRestaurantChoosed() != null && workmatesRestaurantList.size() > 0) {
-                boolean isGood = false;
+                boolean restaurantChoosed = false;
                 Restaurant restaurant = new Restaurant();
                 for (Restaurant r : workmatesRestaurantList) {
                     if (r.getPlace_id().equals(user.getRestaurantChoosed())) {
                         restaurant = r;
-                        isGood = true;
+                        restaurantChoosed = true;
                     }
                 }
-                if (isGood){
+                if (restaurantChoosed){
                     Intent i = new Intent(context, RestaurantProfilActivity.class);
                     i.putExtra("place_id", restaurant.getPlace_id());
                     i.putExtra("name", restaurant.getName());

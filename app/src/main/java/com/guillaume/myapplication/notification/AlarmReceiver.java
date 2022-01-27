@@ -23,11 +23,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         mWorkManager = WorkManager.getInstance(context);
 
-        Toast.makeText(context, "Alarm's running", Toast.LENGTH_LONG).show();
         Log.e(TAG, "Alarm's running");
         //todo put the good work request after the test
-        applyNotification();
-        //applyNotificationPeriodically();
+        //applyNotification();
+        applyNotificationPeriodically();
     }
 
     private void applyNotification() {

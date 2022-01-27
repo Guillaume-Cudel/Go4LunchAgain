@@ -372,6 +372,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(@NonNull LocationResult locationResult) {
+                    // todo check it
                     if (locationResult == null) {
                         return;
                     }
@@ -418,8 +419,15 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
     private void showRestaurantChoosed() {
         if (mCurrentUser.getRestaurantChoosed() == null) {
-            Toast.makeText(NavigationActivity.this, R.string.NavigationChooseRestaurant, Toast.LENGTH_LONG).show();
-            //todo put alertdialog instead Toast
+            //todo put alertdialog instead Toast ---> check
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("You have not chosen a restaurant.");
+            builder.setMessage("Please, choose a restaurant.");
+            builder.setNegativeButton("Ok", null);
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
         } else {
             firestoreUserViewModel.getRestaurant(mCurrentUser.getUid(), mCurrentUser.getRestaurantChoosed()).observe(this, new Observer<Restaurant>() {
                 @Override
@@ -437,7 +445,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 }
             });
         }
-
     }
 
     private void openSettings() {
@@ -537,7 +544,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         locationViewModel.setCurrentUser(currentUser);
     }
 
-    //todo fix bug with photo and search
     private void recoveCurrentRestaurantsDisplayed() {
         locationViewModel.currentRestaurantsDisplayedLiveData.observe(this, new Observer<List<Restaurant>>() {
             @Override

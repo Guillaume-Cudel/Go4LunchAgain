@@ -96,7 +96,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                              ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_map, container, false);
-        //todo verify this
         if(authUser != null){
             userUid = authUser.getUid();
         }
