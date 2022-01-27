@@ -61,9 +61,9 @@ public class RestaurantProfilActivity extends AppCompatActivity {
     private TextView nameText, typeText, vicinityText, likeText;
     private ImageView restaurantPhoto, star1, star2, star3, callImage, likeImage, websiteImage;
     private FloatingActionButton choosedButton;
-    private final String workID = "notificationWorkID";
+    /*private final String workID = "notificationWorkID";
     private PendingIntent alarmIntent;
-    private WorkManager mWorkManager;
+    private WorkManager mWorkManager;*/
 
     @NonNull
     private List<UserFirebase> participantslist = new ArrayList<>();
@@ -98,10 +98,10 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         recoveData();
         setFieldsWithData();
 
-        mWorkManager = WorkManager.getInstance(this);
+        /*mWorkManager = WorkManager.getInstance(this);
 
         Intent intent = new Intent(RestaurantProfilActivity.this, AlarmReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(RestaurantProfilActivity.this, 0, intent, 0);
+        alarmIntent = PendingIntent.getBroadcast(RestaurantProfilActivity.this, 0, intent, 0);*/
 
         Injection.provideRestaurantViewModel(this).getDetails(placeID)
                 .observe(this, new Observer<Details>() {
@@ -235,18 +235,19 @@ public class RestaurantProfilActivity extends AppCompatActivity {
             public void onChanged(UserFirebase userFirebase) {
                 if (mCurrentUser != null) {
                     boolean addParticipant;
+                    //todo kick cancelNotification() after this best implementation
                     if (mCurrentUser.getRestaurantChoosed() == null) {
-                        cancelNotification();
+                        //cancelNotification();
                         addParticipant = true;
                         fUserViewModel.updateRestaurantChoosed(mCurrentUser.getUid(), placeID);
                         fUserViewModel.updateFieldRestaurantName(mCurrentUser.getUid(), name);
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
-                        startAlarm();
+                        //startAlarm();
 
                     } else if (!mCurrentUser.getRestaurantChoosed().equals(placeID)) {
-                        cancelNotification();
+                        //cancelNotification();
                         addParticipant = true;
                         boolean participantElsewhere = false;
                         fRestaurantViewModel.updateParticipantNumber(mCurrentUser.getRestaurantChoosed(), participantElsewhere);
@@ -257,13 +258,11 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
-                        startAlarm();
+                        //startAlarm();
 
                     } else {
-                        cancelNotification();
-                        //todo check it
+                        //cancelNotification();
                         addParticipant = false;
-                        //todo test this method
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
                         fUserViewModel.deleteRestaurantChoosed(mCurrentUser.getUid());
                         fUserViewModel.deleteRestaurantname(mCurrentUser.getUid());
@@ -454,7 +453,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
     }
 
 
-    @SuppressLint("LongLogTag")
+    /*@SuppressLint("LongLogTag")
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void startAlarm() {
 
@@ -476,7 +475,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         mWorkManager.cancelAllWorkByTag(workID);
         // Alarm cancel
         manager.cancel(alarmIntent);
-    }
+    }*/
 }
 
 

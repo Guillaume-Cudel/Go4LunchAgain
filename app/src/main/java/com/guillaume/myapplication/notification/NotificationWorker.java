@@ -42,7 +42,6 @@ import java.util.List;
 public class NotificationWorker extends Worker {
 
     private final CharSequence name = "Channel 1";
-    private String restaurantID;
     private Restaurant mRestaurant;
     private UserFirebase currentUser;
     private List<UserFirebase> workmates = new ArrayList<>();
@@ -76,9 +75,11 @@ public class NotificationWorker extends Worker {
             @Override
             public void onSuccess(UserFirebase user) {
                 currentUser = user;
-                restaurantID = currentUser.getRestaurantChoosed();
-                recoveRestaurantData(restaurantID);
-                recoveAllWorkmates(restaurantID, context);
+                if(currentUser.getRestaurantChoosed() != null) {
+                    String restaurantID = currentUser.getRestaurantChoosed();
+                    recoveRestaurantData(restaurantID);
+                    recoveAllWorkmates(restaurantID, context);
+                }
             }
 
             @Override

@@ -1,6 +1,9 @@
 package com.guillaume.myapplication;
 
+import static com.guillaume.myapplication.R.string.notification_actived;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
@@ -10,6 +13,9 @@ import androidx.fragment.app.FragmentTransaction;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,8 +25,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,6 +43,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
+import androidx.work.WorkManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -44,6 +53,7 @@ import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
 import com.guillaume.myapplication.model.requests.Photos;
+import com.guillaume.myapplication.notification.AlarmReceiver;
 import com.guillaume.myapplication.search.SuggestionSimpleCursorAdapter;
 import com.guillaume.myapplication.search.SuggestionsDatabase;
 import com.guillaume.myapplication.ui.BaseActivity;
@@ -67,6 +77,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -87,6 +98,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private SuggestionsDatabase database;
     private List<Restaurant> currentRestaurantsDisplayed = new ArrayList<Restaurant>();
 
+    private PendingIntent alarmIntent;
+    private WorkManager mWorkManager;
+
     public Fragment fragmentMap;
     public Fragment fragmentRestaurantsList;
     public Fragment fragmentWorkmates;
@@ -106,6 +120,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,6 +133,11 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         locationViewModel = Injection.provideLocationViewModel(this);
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
         database = new SuggestionsDatabase(this);
+
+        mWorkManager = WorkManager.getInstance(this);
+
+        Intent intent = new Intent(NavigationActivity.this, AlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
         // Show the first fragment when starting activity
         fragmentMap = new MapFragment();
@@ -137,6 +157,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         updateUIWhenCreating();
         onClickItemsDrawer();
         setCurrentUser();
+        startAlarm();
     }
 
     @Override
@@ -630,5 +651,32 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private void openChatActivity(){
         Intent i = new Intent(this, ChatActivity.class);
         startActivity(i);
+    }
+
+    // NOTIFICATION
+
+    @SuppressLint("LongLogTag")
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void startAlarm() {
+
+        // todo Launch the method from onCreate() of NavigationActivity
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 11);
+        calendar.set(Calendar.MINUTE, 59);
+
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+        Log.e("RestaurantProfilActivity", "SetExact alarm launched");
+        Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
+    }
+
+    private void cancelNotification(){
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        // Work cancel
+        String workID = "notificationWorkID";
+        mWorkManager.cancelAllWorkByTag(workID);
+        // Alarm cancel
+        manager.cancel(alarmIntent);
     }
 }
