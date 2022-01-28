@@ -98,4 +98,5 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.6.0'
     // workmanager's implementation
     implementation 'androidx.work:work-runtime:2.7.1'
+    implementation "androidx.concurrent:concurrent-futures:1.1.0"
 }

@@ -6,40 +6,35 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.UserManager;
+import android.telecom.Call;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.concurrent.futures.CallbackToFutureAdapter;
+import androidx.concurrent.futures.ResolvableFuture;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
-import androidx.work.Worker;
+import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
 
-import com.google.android.gms.tasks.Task;
+import com.android.volley.Response;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.guillaume.myapplication.NavigationActivity;
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.api.RestaurantHelper;
 import com.guillaume.myapplication.api.UserHelper;
-import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
-import com.guillaume.myapplication.repository.UserRepository;
-import com.guillaume.myapplication.viewModel.FirestoreRestaurantViewModel;
-import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
-import com.guillaume.myapplication.viewModel.LocationViewModel;
-import com.guillaume.myapplication.viewModel.RestaurantViewModel;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotificationWorker extends Worker {
+import javax.security.auth.callback.Callback;
+
+public class NotificationWorker extends ListenableWorker {
 
     private final CharSequence name = "Channel 1";
     private Restaurant mRestaurant;
@@ -50,6 +45,7 @@ public class NotificationWorker extends Worker {
     private FirebaseUser authUser = mAuth.getCurrentUser();
     private String userID = authUser.getUid();
     private final String TAG = "NotificationWorker";
+    private ResolvableFuture<Result> mFuture;
 
 
     public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -58,24 +54,41 @@ public class NotificationWorker extends Worker {
 
     @NonNull
     @Override
-    public Result doWork() {
+    public ListenableFuture<Result> startWork() {
+        //todo finish to set it
         Context applicationContext = getApplicationContext();
 
-        try {
-            recoveUserData(userID, applicationContext);
-            return Result.success();
-        } catch (Throwable throwable) {
-            Log.e(TAG, "Error applying notification", throwable);
-            return Result.failure();
-        }
+        return CallbackToFutureAdapter.getFuture(completer -> {
+            Callback callback = new Callback() {
+                int successes = 0;
+
+
+                public void onFailure(Call call, IOException e) {
+                    completer.setException(e);
+                }
+
+
+                public void onResponse(Call call, Response response) {
+                    successes++;
+                    if (successes == 100) {
+                        completer.set(Result.success());
+                    }
+                }
+            };
+
+            recoveData(userID, applicationContext);
+
+            return callback;
+        });
     }
 
-    private void recoveUserData(String userID, Context context){
+
+    private void recoveData(String userID, Context context) {
         UserHelper.getUser(userID, new UserHelper.GetUserCallback() {
             @Override
             public void onSuccess(UserFirebase user) {
                 currentUser = user;
-                if(currentUser.getRestaurantChoosed() != null) {
+                if (currentUser.getRestaurantChoosed() != null) {
                     String restaurantID = currentUser.getRestaurantChoosed();
                     recoveRestaurantData(restaurantID);
                     recoveAllWorkmates(restaurantID, context);
@@ -89,7 +102,8 @@ public class NotificationWorker extends Worker {
         });
     }
 
-    private void recoveRestaurantData(String restaurantID){
+
+    private void recoveRestaurantData(String restaurantID) {
         RestaurantHelper.getTargetedRestaurant(restaurantID, new RestaurantHelper.GetRestaurantsTargetedCallback() {
             @Override
             public void onSuccess(Restaurant restaurant) {
@@ -103,12 +117,14 @@ public class NotificationWorker extends Worker {
         });
     }
 
-    private void recoveAllWorkmates(String restaurantID, Context context){
+    private void recoveAllWorkmates(String restaurantID, Context context) {
         RestaurantHelper.getAllUsers(restaurantID, new RestaurantHelper.GetAllUsersCallback() {
             @Override
             public void onSuccess(List<UserFirebase> list) {
                 workmates = list;
-                sendNotification(context);
+                if(workmates.size() > 0 && mRestaurant != null) {
+                    sendNotification(context);
+                }
             }
 
             @Override
@@ -118,8 +134,9 @@ public class NotificationWorker extends Worker {
         });
     }
 
-    private void convertWorkmatesToString(){
-        for(int i = 0; i < workmates.size(); i++){
+    private void convertWorkmatesToString() {
+        workmatesName.clear();
+        for (int i = 0; i < workmates.size(); i++) {
             workmatesName.add(workmates.get(i).getUsername());
         }
     }
@@ -128,6 +145,7 @@ public class NotificationWorker extends Worker {
     private void sendNotification(Context context) {
 
         convertWorkmatesToString();
+        //todo fix bug with name send 2 times
         StringBuilder wNames = new StringBuilder();
 
         String prefix = ", ";
@@ -178,5 +196,10 @@ public class NotificationWorker extends Worker {
 
         int notificationID = 1;
         notificationManager.notify(notificationID, builder.build());
+
     }
+
 }
+
+
+

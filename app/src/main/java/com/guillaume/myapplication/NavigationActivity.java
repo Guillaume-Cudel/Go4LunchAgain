@@ -43,6 +43,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
+import androidx.work.Configuration;
 import androidx.work.WorkManager;
 
 import com.bumptech.glide.Glide;
@@ -79,6 +80,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -135,7 +137,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         database = new SuggestionsDatabase(this);
 
         mWorkManager = WorkManager.getInstance(this);
-
         Intent intent = new Intent(NavigationActivity.this, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
@@ -671,6 +672,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
     }
 
+    // Method to cancel workManager if this setting is implemented
     private void cancelNotification(){
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         // Work cancel
