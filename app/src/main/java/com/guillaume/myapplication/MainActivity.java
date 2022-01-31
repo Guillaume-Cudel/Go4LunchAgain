@@ -1,19 +1,30 @@
 
 package com.guillaume.myapplication;
 
+import static com.guillaume.myapplication.R.string.notification_actived;
+
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
+import androidx.work.WorkManager;
 
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.databinding.ActivityMainBinding;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
+import com.guillaume.myapplication.notification.AlarmReceiver;
 import com.guillaume.myapplication.ui.BaseActivity;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
 import com.facebook.AccessToken;
@@ -39,6 +50,8 @@ import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Calendar;
+
 public class MainActivity extends BaseActivity {
 
     private static final String TAG = "SignInActivity";
@@ -49,12 +62,15 @@ public class MainActivity extends BaseActivity {
     GoogleSignInClient gsi;
     private FirebaseAuth mAuth;
     private FirestoreUserViewModel firestoreUserViewModel;
+    private PendingIntent alarmIntent;
+    private WorkManager mWorkManager;
 
 
     @Override
     public int getFragmentLayout() {
         return R.layout.activity_main;
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +80,15 @@ public class MainActivity extends BaseActivity {
         View view = binding.getRoot();
         setContentView(view);
 
+        mWorkManager = WorkManager.getInstance(this);
+        Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+        alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
         mAuth = FirebaseAuth.getInstance();
+
+        //cancelNotification();
+        //startAlarm();
     }
 
 
@@ -84,18 +107,24 @@ public class MainActivity extends BaseActivity {
 
     private void onClickGoogleButton() {
         binding.googleSignInButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
                 signInWithGoogle();
+                cancelNotification();
+                startAlarm();
             }
         });
     }
 
     private void onClickFacebookButton() {
         binding.facebookLoginButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
                 configureFacebookAuth();
+                cancelNotification();
+                startAlarm();
             }
         });
     }
@@ -249,5 +278,32 @@ public class MainActivity extends BaseActivity {
             String radius = "1000";
             firestoreUserViewModel.createUser(uid, username, urlPicture, radius);
         }
+    }
+
+    // NOTIFICATION
+
+    @SuppressLint("LongLogTag")
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void startAlarm() {
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        //calendar.set(Calendar.MINUTE, 40);
+
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+        Log.e("MainActivity", "SetExact alarm launched");
+        //Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
+    }
+
+    // Method to cancel workManager if this setting is implemented
+    private void cancelNotification(){
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        // Work cancel
+        String workID = "notificationWorkID";
+        mWorkManager.cancelAllWorkByTag(workID);
+        // Alarm cancel
+        manager.cancel(alarmIntent);
     }
 }

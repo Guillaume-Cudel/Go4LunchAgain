@@ -100,9 +100,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private SuggestionsDatabase database;
     private List<Restaurant> currentRestaurantsDisplayed = new ArrayList<Restaurant>();
 
-    private PendingIntent alarmIntent;
-    private WorkManager mWorkManager;
-
     public Fragment fragmentMap;
     public Fragment fragmentRestaurantsList;
     public Fragment fragmentWorkmates;
@@ -136,10 +133,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
         database = new SuggestionsDatabase(this);
 
-        mWorkManager = WorkManager.getInstance(this);
-        Intent intent = new Intent(NavigationActivity.this, AlarmReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-
         // Show the first fragment when starting activity
         fragmentMap = new MapFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -158,7 +151,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         updateUIWhenCreating();
         onClickItemsDrawer();
         setCurrentUser();
-        startAlarm();
     }
 
     @Override
@@ -652,33 +644,5 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private void openChatActivity(){
         Intent i = new Intent(this, ChatActivity.class);
         startActivity(i);
-    }
-
-    // NOTIFICATION
-
-    @SuppressLint("LongLogTag")
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void startAlarm() {
-
-        // todo Launch the method from onCreate() of NavigationActivity
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 11);
-        calendar.set(Calendar.MINUTE, 59);
-
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
-        Log.e("RestaurantProfilActivity", "SetExact alarm launched");
-        Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
-    }
-
-    // Method to cancel workManager if this setting is implemented
-    private void cancelNotification(){
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        // Work cancel
-        String workID = "notificationWorkID";
-        mWorkManager.cancelAllWorkByTag(workID);
-        // Alarm cancel
-        manager.cancel(alarmIntent);
     }
 }

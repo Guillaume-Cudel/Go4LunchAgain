@@ -25,8 +25,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Log.e(TAG, "Alarm's running");
         //todo put the good work request after the test
-        applyNotification();
-        //applyNotificationPeriodically();
+        //applyNotification();
+        applyNotificationPeriodically();
     }
 
     private void applyNotification() {

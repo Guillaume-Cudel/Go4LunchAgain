@@ -43,13 +43,15 @@ public class NotificationWorker extends ListenableWorker {
     private List<String> workmatesName = new ArrayList<>();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser authUser = mAuth.getCurrentUser();
-    private String userID = authUser.getUid();
+    private String userID;
     private final String TAG = "NotificationWorker";
-    private ResolvableFuture<Result> mFuture;
 
 
     public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
+        if(authUser != null){
+            userID = authUser.getUid();
+        }
     }
 
     @NonNull

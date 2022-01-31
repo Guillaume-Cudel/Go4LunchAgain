@@ -237,17 +237,14 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                     boolean addParticipant;
                     //todo kick cancelNotification() after this best implementation
                     if (mCurrentUser.getRestaurantChoosed() == null) {
-                        //cancelNotification();
                         addParticipant = true;
                         fUserViewModel.updateRestaurantChoosed(mCurrentUser.getUid(), placeID);
                         fUserViewModel.updateFieldRestaurantName(mCurrentUser.getUid(), name);
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
-                        //startAlarm();
 
                     } else if (!mCurrentUser.getRestaurantChoosed().equals(placeID)) {
-                        //cancelNotification();
                         addParticipant = true;
                         boolean participantElsewhere = false;
                         fRestaurantViewModel.updateParticipantNumber(mCurrentUser.getRestaurantChoosed(), participantElsewhere);
@@ -258,10 +255,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
                         fUserViewModel.createRestaurant(mCurrentUser.getUid(), placeID, photoReference, photoWidth, name, vicinity, type, rating);
                         fRestaurantViewModel.createUserToRestaurant(placeID, mCurrentUser.getUid(), mCurrentUser.getUsername(), mCurrentUser.getUrlPicture());
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
-                        //startAlarm();
-
                     } else {
-                        //cancelNotification();
                         addParticipant = false;
                         fRestaurantViewModel.updateParticipantNumber(placeID, addParticipant);
                         fUserViewModel.deleteRestaurantChoosed(mCurrentUser.getUid());
