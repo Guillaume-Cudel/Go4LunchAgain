@@ -10,7 +10,7 @@ import com.guillaume.myapplication.model.Restaurant;
 
 import java.util.List;
 
-public class LocationViewModel extends ViewModel {
+public class UtilsViewModel extends ViewModel {
 
     private final MutableLiveData<LatLng> _locationLiveData = new MutableLiveData<>();
     public LiveData<LatLng> locationLiveData = _locationLiveData;

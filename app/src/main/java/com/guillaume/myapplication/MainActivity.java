@@ -86,9 +86,6 @@ public class MainActivity extends BaseActivity {
 
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
         mAuth = FirebaseAuth.getInstance();
-
-        //cancelNotification();
-        //startAlarm();
     }
 
 
@@ -290,11 +287,11 @@ public class MainActivity extends BaseActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-        //calendar.set(Calendar.MINUTE, 40);
+        //calendar.set(Calendar.MINUTE, 15);
 
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
         Log.e("MainActivity", "SetExact alarm launched");
-        //Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
+        Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
     }
 
     // Method to cancel workManager if this setting is implemented

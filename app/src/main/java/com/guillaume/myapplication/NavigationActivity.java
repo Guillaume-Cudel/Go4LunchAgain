@@ -1,7 +1,5 @@
 package com.guillaume.myapplication;
 
-import static com.guillaume.myapplication.R.string.notification_actived;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -13,9 +11,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,7 +23,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,8 +37,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
-import androidx.work.Configuration;
-import androidx.work.WorkManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -54,7 +46,6 @@ import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
 import com.guillaume.myapplication.model.requests.Photos;
-import com.guillaume.myapplication.notification.AlarmReceiver;
 import com.guillaume.myapplication.search.SuggestionSimpleCursorAdapter;
 import com.guillaume.myapplication.search.SuggestionsDatabase;
 import com.guillaume.myapplication.ui.BaseActivity;
@@ -64,7 +55,7 @@ import com.guillaume.myapplication.ui.restaurant_profil.RestaurantProfilActivity
 import com.guillaume.myapplication.ui.restaurants_list.RestaurantsListFragment;
 import com.guillaume.myapplication.ui.workmates.WorkmatesFragment;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
-import com.guillaume.myapplication.viewModel.LocationViewModel;
+import com.guillaume.myapplication.viewModel.UtilsViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -73,14 +64,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -90,7 +78,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
     private ActivityNavigationBinding binding;
     private BottomNavigationView mBottomNavigationView;
-    private LocationViewModel locationViewModel;
+    private UtilsViewModel utilsViewModel;
     private FirestoreUserViewModel firestoreUserViewModel;
     private LocationCallback locationCallback;
     private final FirebaseUser currentUser = this.getCurrentUser();
@@ -127,9 +115,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         View view = binding.getRoot();
         setContentView(view);
 
+
         mBottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_bottom_nav_view);
 
-        locationViewModel = Injection.provideLocationViewModel(this);
+        utilsViewModel = Injection.provideUtilsViewModel(this);
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
         database = new SuggestionsDatabase(this);
 
@@ -319,15 +308,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             fragmentMap = MapFragment.newInstance();
             startTransactionFragment(fragmentMap);
             return;
-        }/*else {
-            // Refresh your fragment here
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.detach(fragmentMap);
-            fragmentMap = MapFragment.newInstance();
-            transaction.commitAllowingStateLoss();
-            startTransactionFragment(fragmentMap);
-            Log.w("IsRefresh", "Yes");
-        }*/
+        }
         startTransactionFragment(fragmentMap);
     }
 
@@ -386,13 +367,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(@NonNull LocationResult locationResult) {
-                    // todo check it
-                    if (locationResult == null) {
-                        return;
-                    }
+
                     for (Location location : locationResult.getLocations()) {
                         if (location != null) {
-                            locationViewModel.setLocation(location.getLatitude(), location.getLongitude());
+                            utilsViewModel.setLocation(location.getLatitude(), location.getLongitude());
                         }
                     }
                 }
@@ -409,7 +387,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                         startLocationUpdates(locationRequest, locationCallback);
                     }
                     if (location != null) {
-                        locationViewModel.setLocation(location.getLatitude(), location.getLongitude());
+                        utilsViewModel.setLocation(location.getLatitude(), location.getLongitude());
                         stopLocationUpdates(locationCallback);
                     }
                 }
@@ -542,7 +520,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                     String finalRadius = String.valueOf(currentRadius);
                     firestoreUserViewModel.updateRadius(currentUser.getUid(), finalRadius);
                     //showMapFragment();
-                    locationViewModel.refreshMap(finalRadius);
+                    utilsViewModel.refreshMap(finalRadius);
                     dialog.cancel();
                 }
             });
@@ -555,11 +533,11 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     }
 
     private void setCurrentUser() {
-        locationViewModel.setCurrentUser(currentUser);
+        utilsViewModel.setCurrentUser(currentUser);
     }
 
     private void recoveCurrentRestaurantsDisplayed() {
-        locationViewModel.currentRestaurantsDisplayedLiveData.observe(this, new Observer<List<Restaurant>>() {
+        utilsViewModel.currentRestaurantsDisplayedLiveData.observe(this, new Observer<List<Restaurant>>() {
             @Override
             public void onChanged(List<Restaurant> restaurants) {
                 currentRestaurantsDisplayed = restaurants;

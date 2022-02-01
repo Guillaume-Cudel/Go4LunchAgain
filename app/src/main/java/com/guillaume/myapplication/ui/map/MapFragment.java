@@ -1,7 +1,5 @@
 package com.guillaume.myapplication.ui.map;
 
-import static pub.devrel.easypermissions.RationaleDialogFragment.TAG;
-
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -13,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,14 +24,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.guillaume.myapplication.NavigationActivity;
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.model.Details;
@@ -47,7 +36,7 @@ import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.requests.Photos;
 import com.guillaume.myapplication.viewModel.FirestoreRestaurantViewModel;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
-import com.guillaume.myapplication.viewModel.LocationViewModel;
+import com.guillaume.myapplication.viewModel.UtilsViewModel;
 import com.guillaume.myapplication.viewModel.RestaurantViewModel;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -79,7 +68,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private RestaurantViewModel mRestaurantVM;
     private FirestoreRestaurantViewModel mFirestoreRestaurantVM;
     private FirestoreUserViewModel mFirestoreUserVM;
-    private LocationViewModel locationViewModel;
+    private UtilsViewModel utilsViewModel;
     private ProgressDialog loading;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser authUser = mAuth.getCurrentUser();
@@ -106,9 +95,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
+        //loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
         navActivity = (NavigationActivity) getActivity();
-        locationViewModel = new ViewModelProvider(navActivity).get(LocationViewModel.class);
+        utilsViewModel = new ViewModelProvider(navActivity).get(UtilsViewModel.class);
         mRestaurantVM = Injection.provideRestaurantViewModel(getActivity());
         mFirestoreRestaurantVM = Injection.provideFirestoreRestaurantViewModel(getActivity());
         mFirestoreUserVM = Injection.provideFirestoreUserViewModel(getActivity());
@@ -116,6 +105,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapFragment = SupportMapFragment.newInstance();
         mapFragment.getMapAsync(this);
         getChildFragmentManager().beginTransaction().replace(R.id.map_fragment, mapFragment).commit();
+
+        /*recoveLocation();
+        if(userUid != null) {
+            recoveRadius();
+        }*/
+        //recoveLocation();
         refreshMap();
     }
 
@@ -135,31 +130,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         );
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(toulouseBounds.getCenter(), 12));
 
-        if (mLatlng != null) {
-            plotBlueDot();
-        }
-
         // verify permission
-        if (ActivityCompat.checkSelfPermission(getContext(),
+        if (ActivityCompat.checkSelfPermission(requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                && ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        //recoveLocation();
+        if(userUid != null) {
+            recoveRadius();
+        }
+
+
         // filter my position
         map.setMyLocationEnabled(true);
         map.setOnMyLocationButtonClickListener(this);
         map.setOnInfoWindowClickListener(this);
-        if(userUid != null) {
-            recoveRadius();
-        }
+
     }
 
     private void refreshMap() {
-        locationViewModel.refreshLiveData.observe(requireActivity(), new Observer<String>() {
+        utilsViewModel.refreshLiveData.observe(requireActivity(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 if(userUid != null) {
+                    //recoveLocation();
                     recoveRadius();
                 }
             }
@@ -171,13 +167,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             @Override
             public void onChanged(UserFirebase user) {
                 mRadius = user.getCurrentRadius();
-                initLocationviewModel();
+                recoveLocation();
+                //initLocationviewModel();
             }
         });
     }
 
-    private void initLocationviewModel() {
-        locationViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
+    /*private void initLocationviewModel() {
+        utilsViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
             @Override
             public void onChanged(LatLng latLng) {
                 mLatlng = latLng;
@@ -185,15 +182,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 recoveRestaurantsFromDatabase();
             }
         });
+    }*/
+
+    private void recoveLocation(){
+        utilsViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
+            @Override
+            public void onChanged(LatLng latLng) {
+                mLatlng = latLng;
+                plotBlueDot(mLatlng.latitude, mLatlng.longitude);
+                recoveRestaurantsFromDatabase(mLatlng.latitude, mLatlng.longitude);
+            }
+        });
     }
 
-    private void recoveRestaurantsFromDatabase() {
+    private void recoveRestaurantsFromDatabase(double latitude, double longitude) {
         mFirestoreRestaurantVM.getAllRestaurants().observe(requireActivity(), new Observer<List<Restaurant>>() {
             @Override
             public void onChanged(List<Restaurant> restaurants) {
                 MapFragment.this.restaurantsSaved.clear();
                 MapFragment.this.restaurantsSaved.addAll(restaurants);
-                recoveRestaurantsFromPlace(mLatlng.latitude, mLatlng.longitude, mRadius);
+                recoveRestaurantsFromPlace(latitude, longitude, mRadius);
             }
         });
     }
@@ -202,12 +210,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         String locationText = latitude + "," + longitude;
 
         if (scope != null) {
-            mRestaurantVM.getRestaurants(locationText, scope).observe(navActivity, new Observer<List<Restaurant>>() {
+            mRestaurantVM.getRestaurants(locationText, scope).observe(requireActivity(), new Observer<List<Restaurant>>() {
                 @Override
                 public void onChanged(List<Restaurant> restaurants) {
                     MapFragment.this.restaurantsList.clear();
                     MapFragment.this.restaurantsList.addAll(restaurants);
-                    locationViewModel.setCurrentRestaurantsDisplayed(restaurantsList);
+                    utilsViewModel.setCurrentRestaurantsDisplayed(restaurantsList);
 
                     for (int i = 0; i < restaurantsList.size(); i++) {
                         boolean isSaved = false;
@@ -274,7 +282,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     }
                 }
             }
-            loading.cancel();
+            //loading.cancel();
         }
     }
 
@@ -323,10 +331,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
 
-    private void plotBlueDot() {
-        if (mLatlng != null) {
-            double latitude = mLatlng.latitude;
-            double longitude = mLatlng.longitude;
+    private void plotBlueDot(double latitude, double longitude) {
 
             if (map != null) {
                 LatLng myPosition = new LatLng(latitude, longitude);
@@ -334,9 +339,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 CameraUpdate zoom = CameraUpdateFactory.zoomTo(14);
                 map.moveCamera(CameraUpdateFactory.newLatLng(myPosition));
                 map.animateCamera(zoom);
-
             }
-        }
     }
 
 

@@ -8,7 +8,7 @@ import com.guillaume.myapplication.network.ApiService;
 import com.guillaume.myapplication.repository.RestaurantRepositoryImpl;
 import com.guillaume.myapplication.viewModel.FirestoreRestaurantViewModel;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
-import com.guillaume.myapplication.viewModel.LocationViewModel;
+import com.guillaume.myapplication.viewModel.UtilsViewModel;
 import com.guillaume.myapplication.viewModel.RestaurantViewModel;
 import com.guillaume.myapplication.viewModel.ViewModelFactory;
 
@@ -44,8 +44,8 @@ public class Injection {
         return new ViewModelProvider(activity, mViewModelFactory).get(RestaurantViewModel.class);
     }
 
-    public static LocationViewModel provideLocationViewModel(FragmentActivity activity){
-        return new ViewModelProvider(activity).get(LocationViewModel.class);
+    public static UtilsViewModel provideUtilsViewModel(FragmentActivity activity){
+        return new ViewModelProvider(activity).get(UtilsViewModel.class);
     }
 
     public static FirestoreUserViewModel provideFirestoreUserViewModel(FragmentActivity activity){

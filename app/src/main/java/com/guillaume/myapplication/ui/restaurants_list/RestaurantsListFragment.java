@@ -3,7 +3,6 @@ package com.guillaume.myapplication.ui.restaurants_list;
 import android.app.ProgressDialog;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,15 +17,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.guillaume.myapplication.NavigationActivity;
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.di.Injection;
-import com.guillaume.myapplication.model.Details;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
 import com.guillaume.myapplication.viewModel.FirestoreRestaurantViewModel;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
-import com.guillaume.myapplication.viewModel.LocationViewModel;
+import com.guillaume.myapplication.viewModel.UtilsViewModel;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -106,8 +103,8 @@ public class RestaurantsListFragment extends Fragment {
 
     private void recoveLocation(){
 
-        LocationViewModel locationViewModel = new ViewModelProvider(getActivity()).get(LocationViewModel.class);
-        locationViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
+        UtilsViewModel utilsViewModel = new ViewModelProvider(getActivity()).get(UtilsViewModel.class);
+        utilsViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
             @Override
             public void onChanged(LatLng latLng) {
                 mLatlng = latLng;
