@@ -29,9 +29,9 @@
     <string name="locationNotGranted">Please grant the location permission</string>
     <string name="error_unknown_error"> A unknow error has appeared</string>
     <string name="likeTextRestaurantProfilValidate">You like</string>
-    <string name="likeTextRestaurantProfilInvalidate" translatable="false">Like</string>
-    <string name="messageRecovingRestaurants" translatable="false">Recoving restaurants</string>
-    <string name="messageRecoveWorkmates" translatable="false">Recoving workmates</string>
+    <string name="likeTextRestaurantProfilInvalidate">Like</string>
+    <string name="messageRecovingRestaurants">Recoving restaurants</string>
+    <string name="messageRecoveWorkmates">Recoving workmates</string>
     <string name="NavigationChooseRestaurant">Please, choose a restaurant.</string>
     <string name="changing_scope">Changing scope</string>
     <string name="progress">Progress: </string>
@@ -49,7 +49,16 @@
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
     <string name="notification_actived">Notification Actived</string>
     <string name="notification_canceled" translatable="false">Notification canceled</string>
-    <string name="Stopped_tracking_seekbar">Stopped tracking seekbar</string>
-
+    <string name="Stopped_tracking_seekbar" translatable="false">Stopped tracking seekbar</string>
+    <string name="call">Call</string>
+    <string name="like">Like</string>
+    <string name="website">Website</string>
+    <string name="restaurant_not_choosen">You have not chosen a restaurant.</string>
+    <string name="choose_restaurant">Please, choose a restaurant.</string>
+    <string name="cancel">Cancel</string>
+    <string name="available_soon">Available soon</string>
+    <string name="search_restaurants">Search restaurant</string>
+    <string name="is_eating"> is eating </string>
+    <string name="not_decided"> hasn\'t decided yet.</string>
 
 </resources>

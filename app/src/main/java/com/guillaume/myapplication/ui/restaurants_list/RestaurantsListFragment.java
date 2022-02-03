@@ -63,7 +63,6 @@ public class RestaurantsListFragment extends Fragment {
         mFirestoreRestaurantVM = Injection.provideFirestoreRestaurantViewModel(getActivity());
         mFirestoreUserVM = Injection.provideFirestoreUserViewModel(getActivity());
 
-
         recoveLocation();
         recoveRadius();
         configureRecyclerView();

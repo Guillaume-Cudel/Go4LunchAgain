@@ -73,14 +73,16 @@ public class WorkmatesAdapter extends RecyclerView.Adapter<WorkmatesAdapter.Work
             if (restaurantName.length() > 20){
                 restaurantName = restaurantName.substring(0, 20);
             }
-            String workmateEating = username + " is eating.";
+            String messageEating = context.getString(R.string.is_eating);
+            String workmateEating = username + messageEating;
             String restaurantText = "(" + restaurantName + ")";
             holder.usernameText.setText(workmateEating);
             holder.usernameText.setTextColor(Color.BLACK);
             holder.restaurantText.setText(restaurantText);
             holder.restaurantText.setTextColor(Color.BLACK);
         }else {
-            String restaurantLess = username + " hasn't decided yet.";
+            String restaurantLessMessage = context.getString(R.string.not_decided);
+            String restaurantLess = username + restaurantLessMessage;
             holder.usernameText.setText(restaurantLess);
             holder.usernameText.setTextColor(Color.GRAY);
         }

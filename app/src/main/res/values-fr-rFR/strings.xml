@@ -8,7 +8,7 @@
     <string name="info_no_username_found">Aucun nom d\'utilisateur trouvé</string>
     <string name="error">Il y a une erreur dans le processus d\'authentification.</string>
     <string name="your_lunch">Ton restaurant</string>
-    <string name="settings">Paramètre</string>
+    <string name="settings">Paramètres</string>
     <string name="log_out">Se déconnecter</string>
     <string name="logo_text">Trouve un restaurant et invite tes collègues à manger !</string>
     <string name="locationNotGranted">Veuillez permettre la localisation</string>
@@ -16,8 +16,8 @@
     <string name="likeTextRestaurantProfilValidate">Tu aimes</string>
     <string name="NavigationChooseRestaurant">Veuillez choisir un restaurant</string>
     <string name="changing_scope">Changer la portée</string>
-    <string name="progress">Chargement</string>
-    <string name="settings_dialog_title">Sélectionnez la portée de recherche de récupération des restaurants :</string>
+    <string name="progress">"Portée: "</string>
+    <string name="settings_dialog_title">Sélectionnez la portée de recherche des restaurants :</string>
     <string name="search_title">Recherche</string>
     <string name="search_hint">Rechercher un restaurant</string>
     <string name="wormateNoChooseRestaurant">Ce collègue n\'as pas encore choisi de restaurant</string>
@@ -26,4 +26,17 @@
     <string name="send">Envoyer</string>
     <string name="workmates_chat_string">Chat des collègues</string>
     <string name="notification_actived">Notification activée</string>
+    <string name="likeTextRestaurantProfilInvalidate">Aimer</string>
+    <string name="call">Appeler</string>
+    <string name="like">Aimer</string>
+    <string name="website">Site web</string>
+    <string name="restaurant_not_choosen">Vous n\'avez pas choisi de restaurant.</string>
+    <string name="choose_restaurant">Merci de choisir un restaurant.</string>
+    <string name="cancel">Annuler</string>
+    <string name="available_soon">Bientot disponible</string>
+    <string name="messageRecovingRestaurants">Récupération des restaurants</string>
+    <string name="messageRecoveWorkmates">Récupération des collègues</string>
+    <string name="search_restaurants">Chercher un restaurant</string>
+    <string name="is_eating">" mange à "</string>
+    <string name="not_decided">" ne s'est pas décidé."</string>
 </resources>

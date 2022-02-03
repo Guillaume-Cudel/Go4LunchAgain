@@ -95,7 +95,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
+        loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
         navActivity = (NavigationActivity) getActivity();
         utilsViewModel = new ViewModelProvider(navActivity).get(UtilsViewModel.class);
         mRestaurantVM = Injection.provideRestaurantViewModel(getActivity());
@@ -168,21 +168,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             public void onChanged(UserFirebase user) {
                 mRadius = user.getCurrentRadius();
                 recoveLocation();
-                //initLocationviewModel();
             }
         });
     }
-
-    /*private void initLocationviewModel() {
-        utilsViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
-            @Override
-            public void onChanged(LatLng latLng) {
-                mLatlng = latLng;
-                plotBlueDot();
-                recoveRestaurantsFromDatabase();
-            }
-        });
-    }*/
 
     private void recoveLocation(){
         utilsViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
@@ -282,7 +270,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     }
                 }
             }
-            //loading.cancel();
+            loading.cancel();
         }
     }
 

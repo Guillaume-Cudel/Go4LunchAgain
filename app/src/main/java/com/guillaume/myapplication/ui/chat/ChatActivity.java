@@ -2,6 +2,7 @@ package com.guillaume.myapplication.ui.chat;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,6 +14,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -30,17 +32,12 @@ public class ChatActivity extends BaseActivity implements ChatAdapter.Listener {
     private RecyclerView chatRecyclerView;
     private TextView emptyRecyclerView;
     private Button sendButton;
+    private ImageButton fileButton;
     private EditText chatEditText;
-
     private static final String CHAT_NAME = "Workmates chat";
-
-    //private UserManager userManager = UserManager.getInstance();
     private ChatManager chatManager = ChatManager.getInstance();
 
-    /*@Override
-    protected ActivityChatBinding getViewBinding() {
-        return ActivityMentorChatBinding.inflate(getLayoutInflater());
-    }*/
+
 
     @Override
     public int getFragmentLayout() {
@@ -50,7 +47,6 @@ public class ChatActivity extends BaseActivity implements ChatAdapter.Listener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_chat);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null){
             actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FF9C1A")));
@@ -60,27 +56,21 @@ public class ChatActivity extends BaseActivity implements ChatAdapter.Listener {
         emptyRecyclerView = findViewById(R.id.activity_chat_text_view_recycler_view_empty);
         sendButton = findViewById(R.id.activity_chat_send_button);
         chatEditText = findViewById(R.id.activity_chat_message_edit_text);
+        fileButton = findViewById(R.id.activity_chat_add_file_button);
 
         configureRecyclerView();
-        setupListeners();
-    }
-
-
-
-    private void setupListeners(){
-
-        // Chat buttons
-        /*binding.androidChatButton.setOnClickListener(view -> { this.configureRecyclerView(CHAT_NAME_ANDROID); });
-        binding.firebaseChatButton.setOnClickListener(view -> { this.configureRecyclerView(CHAT_NAME_FIREBASE); });
-        binding.bugChatButton.setOnClickListener(view -> { this.configureRecyclerView(CHAT_NAME_BUG); });*/
-
         sendButton.setOnClickListener(view -> {sendMessage();});
-
+        fileButton.setOnClickListener(view -> fileButtonMessage());
     }
 
-    // Configure RecyclerView
+    private void fileButtonMessage(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.available_soon);
+        builder.setNegativeButton("OK", null);
+        builder.create().show();
+    }
+
     private void configureRecyclerView(){
-        //Configure Adapter & RecyclerView
         this.chatAdapter = new ChatAdapter(
                 generateOptionsForAdapter(chatManager.getAllMessageForChat(ChatActivity.CHAT_NAME)),
                 Glide.with(this), this);
@@ -88,13 +78,10 @@ public class ChatActivity extends BaseActivity implements ChatAdapter.Listener {
         chatAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
-                //binding.chatRecyclerView.smoothScrollToPosition(chatAdapter.getItemCount()); // Scroll to bottom on new messages
                 chatRecyclerView.smoothScrollToPosition(chatAdapter.getItemCount());
             }
         });
 
-        //binding.chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //binding.chatRecyclerView.setAdapter(this.chatAdapter);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         chatRecyclerView.setAdapter(this.chatAdapter);
     }
@@ -109,24 +96,17 @@ public class ChatActivity extends BaseActivity implements ChatAdapter.Listener {
 
     public void onDataChanged() {
         // Show TextView in case RecyclerView is empty
-        //binding.emptyRecyclerView.setVisibility(this.chatAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
         emptyRecyclerView.setVisibility(this.chatAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     private void sendMessage(){
         // Check if user can send a message (Text not null + user logged)
-        //boolean canSendMessage = !TextUtils.isEmpty(binding.chatEditText.getText()) && userManager.isCurrentUserLogged();
         boolean canSendMessage = !TextUtils.isEmpty(chatEditText.getText());
-
 
         if (canSendMessage){
             // Create a new message for the chat
-            String currentUserName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-            //chatManager.createMessageForChat(binding.chatEditText.getText().toString(), this.currentChatName);
             chatManager.createMessageForChat(chatEditText.getText().toString(), ChatActivity.CHAT_NAME);
-
             // Reset text field
-            //binding.chatEditText.setText("");
             chatEditText.setText("");
         }
     }

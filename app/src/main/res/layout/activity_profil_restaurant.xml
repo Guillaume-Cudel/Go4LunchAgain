@@ -141,7 +141,7 @@
         app:layout_constraintEnd_toEndOf="@+id/view_call"
         app:layout_constraintTop_toBottomOf="@+id/call_image"
         android:layout_marginTop="8dp"
-        android:text="Call"
+        android:text="@string/call"
         android:textStyle="bold"
         android:textSize="20sp"
         android:textColor="@color/orange"
@@ -178,7 +178,7 @@
         app:layout_constraintStart_toStartOf="@+id/view_like"
         app:layout_constraintEnd_toEndOf="@+id/view_like"
         app:layout_constraintTop_toTopOf="@+id/call_text"
-        android:text="Like"
+        android:text="@string/like"
         android:textStyle="bold"
         android:textSize="20sp"
         android:textColor="@color/orange"/>
@@ -212,7 +212,7 @@
         app:layout_constraintStart_toStartOf="@+id/view_website"
         app:layout_constraintEnd_toEndOf="@+id/view_website"
         app:layout_constraintTop_toTopOf="@+id/call_text"
-        android:text="Website"
+        android:text="@string/website"
         android:textStyle="bold"
         android:textSize="20sp"
         android:textColor="@color/orange"/>

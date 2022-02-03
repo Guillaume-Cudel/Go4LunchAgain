@@ -212,7 +212,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         MenuItem menuItem = menu.findItem(R.id.search);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menuItem.getActionView();
-        searchView.setQueryHint("Search restaurants !");
+        searchView.setQueryHint(getString(R.string.search_restaurants));
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
@@ -423,10 +423,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
     private void showRestaurantChoosed() {
         if (mCurrentUser.getRestaurantChoosed() == null) {
-            //todo put alertdialog instead Toast ---> check
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("You have not chosen a restaurant.");
-            builder.setMessage("Please, choose a restaurant.");
+            builder.setTitle(R.string.restaurant_not_choosen);
+            builder.setMessage(R.string.choose_restaurant);
             builder.setNegativeButton("Ok", null);
 
             AlertDialog dialog = builder.create();
@@ -536,7 +535,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 }
             });
 
-            builder.setNegativeButton("Cancel", null);
+            builder.setNegativeButton(R.string.cancel, null);
 
             AlertDialog dialog = builder.create();
             dialog.show();
@@ -559,6 +558,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             }
         });
     }
+
+    // Search
 
     @Override
     public boolean onQueryTextSubmit(String query) {
@@ -630,6 +631,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         startActivity(i);
     }
 
+    // Chat
     private void openChatActivity(){
         Intent i = new Intent(this, ChatActivity.class);
         startActivity(i);
