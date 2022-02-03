@@ -20,6 +20,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.work.WorkManager;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.databinding.ActivityMainBinding;
 import com.guillaume.myapplication.di.Injection;
@@ -52,6 +53,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends BaseActivity {
 
@@ -90,7 +92,7 @@ public class MainActivity extends BaseActivity {
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
         mAuth = FirebaseAuth.getInstance();
 
-        configureGoogleAuth();
+        //configureGoogleAuth();
 
         binding.googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
         onClickGoogleButton();
@@ -118,6 +120,7 @@ public class MainActivity extends BaseActivity {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
+                configureGoogleAuth();
                 signInWithGoogle();
             }
         });
@@ -153,7 +156,7 @@ public class MainActivity extends BaseActivity {
         if (isCurrentUserLogged()) {
             cancelNotification();
             startAlarm();
-            updateUI();
+            updateUI(getCurrentUser());
         }
     }
 
@@ -223,9 +226,9 @@ public class MainActivity extends BaseActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.w(TAG, "signInWithCredential:success");
-                            getUsersList();
-                            //createUserInFirestore();
-                            updateUI();
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            getUsersList(user);
+                            updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -244,20 +247,30 @@ public class MainActivity extends BaseActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            //createUserInFirestore();
-                            getUsersList();
-                            updateUI();
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            getUsersList(user);
+                            updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            updateUI();
+                            updateUI(null);
                         }
                     }
                 });
     }
 
-    private void updateUI() {
-        startNavigationActivity();
+    /*AuthCredential credential = EmailAuthProvider
+            .getCredential("user@example.com", "password1234");*/
+
+
+
+
+
+
+    private void updateUI(FirebaseUser user) {
+        if(user != null){
+            startNavigationActivity();
+        }
     }
 
 
@@ -273,32 +286,31 @@ public class MainActivity extends BaseActivity {
     // REST REQUEST
     // --------------------
 
-    private void getUsersList() {
-        firestoreUserViewModel.getUsersList().observe(this, new Observer<List<UserFirebase>>() {
-            @Override
-            public void onChanged(List<UserFirebase> userFirebases) {
-                boolean registered = false;
-                for (UserFirebase user : userFirebases) {
-                    String userID = user.getUid();
-                    if (userID.equals(getCurrentUser().getUid())) {
-                        registered = true;
-                        break;
+    private void getUsersList(FirebaseUser fUser) {
+            firestoreUserViewModel.getUsersList().observe(this, new Observer<List<UserFirebase>>() {
+                @Override
+                public void onChanged(List<UserFirebase> userFirebases) {
+                    boolean registered = false;
+                    for (UserFirebase user : userFirebases) {
+                        String userID = user.getUid();
+                        if (userID.equals(Objects.requireNonNull(fUser).getUid())) {
+                            registered = true;
+                            break;
+                        }
+                    }
+                    if (!registered) {
+                        createUserInFirestore();
                     }
                 }
-                if(!registered){
-                    createUserInFirestore();
-                }
-            }
-        });
+            });
     }
 
     private void createUserInFirestore() {
-        String urlPicture = (getCurrentUser().getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;
-        String username = getCurrentUser().getDisplayName();
-        String uid = getCurrentUser().getUid();
-        String radius = "1000";
-        firestoreUserViewModel.createUser(uid, username, urlPicture, radius);
-
+            String urlPicture = (Objects.requireNonNull(getCurrentUser()).getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;
+            String username = getCurrentUser().getDisplayName();
+            String uid = getCurrentUser().getUid();
+            String radius = "1000";
+            firestoreUserViewModel.createUser(uid, username, urlPicture, radius);
     }
 
     // NOTIFICATION

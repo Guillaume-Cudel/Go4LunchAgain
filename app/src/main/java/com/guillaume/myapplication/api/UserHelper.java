@@ -40,11 +40,11 @@ public class UserHelper {
 
 
     // Get the Collection Reference
-    public static CollectionReference getUsersCollection(){
+    public static CollectionReference getUsersCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
     }
 
-    public static CollectionReference getRestaurantCollection(String uid){
+    public static CollectionReference getRestaurantCollection(String uid) {
         return UserHelper.getUsersCollection().document(uid).collection(COLLECTION_RESTAURANT);
     }
 
@@ -56,7 +56,7 @@ public class UserHelper {
     }
 
     public static void createRestaurant(String uid, String placeID, String photoData, String photoWidth, String name,
-                                        String vicinity, String type, String rating){
+                                        String vicinity, String type, String rating) {
         Restaurant restaurantToCreate = new Restaurant(placeID, photoData, photoWidth, name,
                 vicinity, type, rating);
         UserHelper.getRestaurantCollection(uid).document(placeID).set(restaurantToCreate);
@@ -64,13 +64,13 @@ public class UserHelper {
 
     // --- GET ---
 
-    public interface GetUsersListCallback{
+    public interface GetUsersListCallback {
         void onSuccess(List<UserFirebase> list);
 
         void onError(Exception exception);
     }
 
-    public static void getAllUsers(GetUsersListCallback callback){
+    public static void getAllUsers(GetUsersListCallback callback) {
         UserHelper.getUsersCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -79,22 +79,26 @@ public class UserHelper {
                     callback.onError(new Exception());
                 }
                 List<UserFirebase> users = new ArrayList<>();
-                for(QueryDocumentSnapshot doc : value){
-                    UserFirebase user = doc.toObject(UserFirebase.class);
-                    users.add(user);
+                if (value != null) {
+                    for (QueryDocumentSnapshot doc : value) {
+                        UserFirebase user = doc.toObject(UserFirebase.class);
+                        users.add(user);
+                    }
+                } else {
+                    callback.onError(new Exception());
                 }
                 callback.onSuccess(users);
             }
         });
     }
 
-    public interface GetUserCallback{
+    public interface GetUserCallback {
         void onSuccess(UserFirebase user);
 
         void onError(Exception exception);
     }
 
-    public static void getUser(String uid, GetUserCallback callback){
+    public static void getUser(String uid, GetUserCallback callback) {
         DocumentReference docRef = UserHelper.getUsersCollection().document(uid);
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -105,9 +109,9 @@ public class UserHelper {
                     callback.onError(new Exception());
                 }
                 UserFirebase user = new UserFirebase();
-                if (value != null && value.exists()){
+                if (value != null && value.exists()) {
                     user = value.toObject(UserFirebase.class);
-                }else{
+                } else {
                     callback.onError(new Exception());
                 }
                 callback.onSuccess(user);
@@ -115,13 +119,13 @@ public class UserHelper {
         });
     }
 
-    public interface GetRestaurantCallback{
+    public interface GetRestaurantCallback {
         void onSuccess(Restaurant restaurant);
 
         void onError(Exception exception);
     }
 
-    public static void getRestaurant(String uid, String placeID, GetRestaurantCallback callback){
+    public static void getRestaurant(String uid, String placeID, GetRestaurantCallback callback) {
         DocumentReference docRef = UserHelper.getRestaurantCollection(uid).document(placeID);
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -132,9 +136,9 @@ public class UserHelper {
                     callback.onError(new Exception());
                 }
                 Restaurant restaurant = new Restaurant();
-                if (value != null && value.exists()){
+                if (value != null && value.exists()) {
                     restaurant = value.toObject(Restaurant.class);
-                }else{
+                } else {
                     callback.onError(new Exception());
                 }
                 callback.onSuccess(restaurant);
@@ -145,15 +149,15 @@ public class UserHelper {
     // --- UPDATE ---
 
 
-    public static void updateRestaurantChoosed(String uid, String restaurantChoosed){
+    public static void updateRestaurantChoosed(String uid, String restaurantChoosed) {
         UserHelper.getUsersCollection().document(uid).update(RESTAURANT_CHOOSED_FIELD, restaurantChoosed);
     }
 
-    public static void updateFieldRestaurantName(String uid, String restaurantName){
+    public static void updateFieldRestaurantName(String uid, String restaurantName) {
         UserHelper.getUsersCollection().document(uid).update(RESTAURANT_NAME_FIELD, restaurantName);
     }
 
-    public static void updateRadius(String uid, String currentRadius){
+    public static void updateRadius(String uid, String currentRadius) {
         UserHelper.getUsersCollection().document(uid).update(CURRENT_RADIUS, currentRadius);
     }
 
@@ -167,7 +171,7 @@ public class UserHelper {
         UserHelper.getUsersCollection().document(uid).update(RESTAURANT_NAME_FIELD, null);
     }
 
-    public static void deleteRestaurant(String uid, String placeID){
+    public static void deleteRestaurant(String uid, String placeID) {
         UserHelper.getRestaurantCollection(uid).document(placeID).delete();
     }
 

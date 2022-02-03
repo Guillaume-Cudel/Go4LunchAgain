@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class RestaurantsListFragment extends Fragment {
@@ -77,21 +78,8 @@ public class RestaurantsListFragment extends Fragment {
         return view;
     }
 
-    private void recoveAllRestaurants(){
-        mFirestoreRestaurantVM.getAllRestaurants().observe(getActivity(), new Observer<List<Restaurant>>() {
-            @Override
-            public void onChanged(List<Restaurant> restaurants) {
-                RestaurantsListFragment.this.restaurantsList.clear();
-                RestaurantsListFragment.this.restaurantsList.addAll(restaurants);
-                filterRestaurantsWithinReach();
-                updateRestaurants();
-                loading.cancel();
-            }
-        });
-    }
-
     private void recoveRadius(){
-        mFirestoreUserVM.getUser(authUser.getUid()).observe(getActivity(), new Observer<UserFirebase>() {
+        mFirestoreUserVM.getUser(authUser.getUid()).observe(Objects.requireNonNull(getActivity()), new Observer<UserFirebase>() {
             @Override
             public void onChanged(UserFirebase userFirebase) {
                 mRadius = userFirebase.getCurrentRadius();
@@ -102,12 +90,25 @@ public class RestaurantsListFragment extends Fragment {
 
     private void recoveLocation(){
 
-        UtilsViewModel utilsViewModel = new ViewModelProvider(getActivity()).get(UtilsViewModel.class);
+        UtilsViewModel utilsViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(UtilsViewModel.class);
         utilsViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
             @Override
             public void onChanged(LatLng latLng) {
                 mLatlng = latLng;
                 updateLocation();
+            }
+        });
+    }
+
+    private void recoveAllRestaurants(){
+        mFirestoreRestaurantVM.getAllRestaurants().observe(getActivity(), new Observer<List<Restaurant>>() {
+            @Override
+            public void onChanged(List<Restaurant> restaurants) {
+                RestaurantsListFragment.this.restaurantsList.clear();
+                RestaurantsListFragment.this.restaurantsList.addAll(restaurants);
+                filterRestaurantsWithinReach();
+                updateRestaurants();
+                loading.cancel();
             }
         });
     }
@@ -139,9 +140,8 @@ public class RestaurantsListFragment extends Fragment {
         loc2.setLongitude(restaurantLocation.longitude);
 
         float distanceInMeters = loc1.distanceTo(loc2);
-        int distanceRound = (int) distanceInMeters;
 
-        return distanceRound;
+        return (int) distanceInMeters;
     }
 
     private LatLng recoveLatLng(Restaurant r) {

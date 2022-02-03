@@ -85,7 +85,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private LocationCallback locationCallback;
     private final FirebaseUser currentUser = this.getCurrentUser();
     private UserFirebase mCurrentUser;
-    private int mRadius, id;
+    private int mRadius;
     private SearchView searchView;
     private SuggestionsDatabase database;
     private List<Restaurant> currentRestaurantsDisplayed = new ArrayList<Restaurant>();
@@ -97,7 +97,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private static final int FRAGMENT_MAP = 0;
     private static final int FRAGMENT_RESTAURANT = 1;
     private static final int FRAGMENT_WORKMATES = 2;
-    private static int DELTA_VALUE = 500;
+    private static final int DELTA_VALUE = 500;
 
     // Easy location
     private static final int REQUEST_LOCATION_PERMISSION = 10;
@@ -142,12 +142,30 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         updateUIWhenCreating();
         onClickItemsDrawer();
         setCurrentUser();
+        recoveRadius();
     }
 
-    //todo met la methode dans onCreate
-    @Override
+    //todo put method in onCreate
+    /*@Override
     protected void onResume() {
         super.onResume();
+        if(currentUser != null) {
+            firestoreUserViewModel.getUser(currentUser.getUid()).observe(this, new Observer<UserFirebase>() {
+                @Override
+                public void onChanged(UserFirebase userFirebase) {
+                    mCurrentUser = userFirebase;
+                    String radiusString = userFirebase.getCurrentRadius();
+                    if(radiusString != null){
+                        mRadius = Integer.parseInt(radiusString);
+                    }
+                }
+            });
+        }
+
+        recoveCurrentRestaurantsDisplayed();
+    }*/
+
+    private void recoveRadius(){
         if(currentUser != null) {
             firestoreUserViewModel.getUser(currentUser.getUid()).observe(this, new Observer<UserFirebase>() {
                 @Override
@@ -242,7 +260,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     public boolean onNavigationItemSelected(MenuItem item) {
 
         //  Handle Navigation Item Click
-        id = item.getItemId();
+        int id = item.getItemId();
         item.setChecked(true);
         binding.drawerLayout.closeDrawers();
 
@@ -259,12 +277,13 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 openSettings();
                 break;
             case R.id.nav_log_out:
-                //todo deco and can choose an other google account
                 mCurrentUser = null;
                 FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
                     @Override
                     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                         if(firebaseAuth.getCurrentUser() == null){
+                            Intent i = new Intent(NavigationActivity.this, MainActivity.class);
+                            startActivity(i);
                             finish();
                         }
                     }

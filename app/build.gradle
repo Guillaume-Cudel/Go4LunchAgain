@@ -84,8 +84,6 @@ dependencies {
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
     implementation 'com.facebook.android:facebook-login:latest.release'
 
-    // Auth twitter
-    //implementation 'com.twitter.sdk.android:twitter-core:3.x'
     // Google play services Restaurant
     implementation "com.google.android.gms:play-services-location:19.0.1"
     // Easy permission

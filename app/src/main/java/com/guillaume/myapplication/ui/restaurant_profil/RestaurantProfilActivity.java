@@ -44,6 +44,7 @@ import com.guillaume.myapplication.model.Details;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
 import com.guillaume.myapplication.notification.AlarmReceiver;
+import com.guillaume.myapplication.ui.BaseActivity;
 import com.guillaume.myapplication.viewModel.FirestoreRestaurantViewModel;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -55,34 +56,32 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class RestaurantProfilActivity extends AppCompatActivity {
+public class RestaurantProfilActivity extends BaseActivity {
 
     private String placeID, photoReference, photoWidth, name, vicinity, type, rating, phoneNum, websiteURL;
     private TextView nameText, typeText, vicinityText, likeText;
     private ImageView restaurantPhoto, star1, star2, star3, callImage, likeImage, websiteImage;
     private FloatingActionButton choosedButton;
-    /*private final String workID = "notificationWorkID";
-    private PendingIntent alarmIntent;
-    private WorkManager mWorkManager;*/
 
     @NonNull
     private List<UserFirebase> participantslist = new ArrayList<>();
     private UserFirebase mCurrentUser = null;
     private UserFirebase mUserLikeRestaurant;
 
-    private Restaurant mRestaurant = null;
     private RecyclerView recyclerView;
     private RestaurantProfilAdapter adapter = new RestaurantProfilAdapter(participantslist, this);
     private Context context;
     private FirestoreUserViewModel fUserViewModel;
     private FirestoreRestaurantViewModel fRestaurantViewModel;
-    private RestaurantViewModel restaurantVM;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private FirebaseUser currentUser = mAuth.getCurrentUser();
+    private FirebaseUser currentUser = this.getCurrentUser();
     private String userUid = currentUser.getUid();
 
     private static final int REQUEST_CALL_PHONE_PERMISSION = 100;
 
+    @Override
+    public int getFragmentLayout() {
+        return R.layout.activity_profil_restaurant;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,11 +96,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         configureView();
         recoveData();
         setFieldsWithData();
-
-        /*mWorkManager = WorkManager.getInstance(this);
-
-        Intent intent = new Intent(RestaurantProfilActivity.this, AlarmReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(RestaurantProfilActivity.this, 0, intent, 0);*/
 
         Injection.provideRestaurantViewModel(this).getDetails(placeID)
                 .observe(this, new Observer<Details>() {
@@ -134,6 +128,7 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         onClickWebsite();
         configureRecyclerView();
     }
+
 
     @Override
     protected void onResume() {
@@ -211,7 +206,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.profil_restaurant_recyclerView);
         fUserViewModel = Injection.provideFirestoreUserViewModel(this);
         fRestaurantViewModel = Injection.provideFirestoreRestaurantViewModel(this);
-        restaurantVM = Injection.provideRestaurantViewModel(this);
     }
 
     private void configureRecyclerView() {
@@ -235,7 +229,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
             public void onChanged(UserFirebase userFirebase) {
                 if (mCurrentUser != null) {
                     boolean addParticipant;
-                    //todo kick cancelNotification() after this best implementation
                     if (mCurrentUser.getRestaurantChoosed() == null) {
                         addParticipant = true;
                         fUserViewModel.updateRestaurantChoosed(mCurrentUser.getUid(), placeID);
@@ -445,31 +438,6 @@ public class RestaurantProfilActivity extends AppCompatActivity {
         Intent browse = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browse);
     }
-
-
-    /*@SuppressLint("LongLogTag")
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void startAlarm() {
-
-        // todo Launch the method from onCreate() of NavigationActivity
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 11);
-        calendar.set(Calendar.MINUTE, 59);
-
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
-        Log.e("RestaurantProfilActivity", "SetExact alarm launched");
-        Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
-    }
-
-    private void cancelNotification(){
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        // Work cancel
-        mWorkManager.cancelAllWorkByTag(workID);
-        // Alarm cancel
-        manager.cancel(alarmIntent);
-    }*/
 }
 
 

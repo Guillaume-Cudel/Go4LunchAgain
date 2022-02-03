@@ -69,37 +69,6 @@ public class NotificationWorker extends Worker {
         }
     }
 
-    /*@NonNull
-    @Override
-    public ListenableFuture<Result> startWork() {
-        //todo finish to set it
-        Context applicationContext = getApplicationContext();
-
-        return CallbackToFutureAdapter.getFuture(completer -> {
-            Callback callback = new Callback() {
-                int successes = 0;
-
-
-                public void onFailure(Call call, IOException e) {
-                    completer.setException(e);
-                }
-
-
-                public void onResponse(Call call, Response response) {
-                    successes++;
-                    if (successes == 100) {
-                        completer.set(Result.success());
-                    }
-                }
-            };
-
-            recoveData(userID, applicationContext);
-
-            return callback;
-        });
-    }*/
-
-
     private void recoveData(String userID, Context context) {
         UserHelper.getUser(userID, new UserHelper.GetUserCallback() {
             @Override
@@ -107,8 +76,7 @@ public class NotificationWorker extends Worker {
                 currentUser = user;
                 if (currentUser.getRestaurantChoosed() != null) {
                     String restaurantID = currentUser.getRestaurantChoosed();
-                    recoveRestaurantData(restaurantID);
-                    recoveAllWorkmates(restaurantID, context);
+                    recoveRestaurantData(restaurantID, context);
                 }
             }
 
@@ -120,12 +88,12 @@ public class NotificationWorker extends Worker {
     }
 
 
-    private void recoveRestaurantData(String restaurantID) {
+    private void recoveRestaurantData(String restaurantID, Context context) {
         RestaurantHelper.getTargetedRestaurant(restaurantID, new RestaurantHelper.GetRestaurantsTargetedCallback() {
             @Override
             public void onSuccess(Restaurant restaurant) {
                 mRestaurant = restaurant;
-                // todo appeller recoveAllWorkmates ici
+                recoveAllWorkmates(restaurantID, context);
             }
 
             @Override
