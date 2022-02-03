@@ -27,7 +27,7 @@ public class FirestoreUserViewModel extends ViewModel {
                 vicinity, type, rating);
     }
 
-    public LiveData<List<UserFirebase>> getWorkmatesList() {
+    public LiveData<List<UserFirebase>> getUsersList() {
         MutableLiveData<List<UserFirebase>> usersListLiveData = new MutableLiveData<List<UserFirebase>>();
         UserHelper.getAllUsers(new UserHelper.GetUsersListCallback() {
             @Override

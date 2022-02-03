@@ -51,6 +51,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends BaseActivity {
 
@@ -58,7 +59,7 @@ public class MainActivity extends BaseActivity {
     private static final int RC_SIGN_IN = 123;
 
     ActivityMainBinding binding;
-    CallbackManager callbackManager = CallbackManager.Factory.create();
+    private CallbackManager callbackManager;
     GoogleSignInClient gsi;
     private FirebaseAuth mAuth;
     private FirestoreUserViewModel firestoreUserViewModel;
@@ -80,19 +81,29 @@ public class MainActivity extends BaseActivity {
         View view = binding.getRoot();
         setContentView(view);
 
+        callbackManager = CallbackManager.Factory.create();
+
         mWorkManager = WorkManager.getInstance(this);
         Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
         mAuth = FirebaseAuth.getInstance();
+
+        configureGoogleAuth();
+
+        binding.googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
+        onClickGoogleButton();
+        onClickFacebookButton();
+
+
     }
 
 
     // ACTION
 
 
-    @Override
+    /*@Override
     protected void onResume() {
         super.onResume();
         configureGoogleAuth();
@@ -100,7 +111,7 @@ public class MainActivity extends BaseActivity {
         binding.googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
         onClickGoogleButton();
         onClickFacebookButton();
-    }
+    }*/
 
     private void onClickGoogleButton() {
         binding.googleSignInButton.setOnClickListener(new View.OnClickListener() {
@@ -108,8 +119,6 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 signInWithGoogle();
-                cancelNotification();
-                startAlarm();
             }
         });
     }
@@ -120,8 +129,6 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 configureFacebookAuth();
-                cancelNotification();
-                startAlarm();
             }
         });
     }
@@ -138,11 +145,16 @@ public class MainActivity extends BaseActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        updateUI();
+        if (isCurrentUserLogged()) {
+            cancelNotification();
+            startAlarm();
+            updateUI();
+        }
     }
 
     // AUTHENTIFICATION
@@ -150,7 +162,7 @@ public class MainActivity extends BaseActivity {
     private void configureGoogleAuth() {
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(getString(R.string.default_web_client_id2))
                 .requestEmail()
                 .build();
 
@@ -159,10 +171,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void configureFacebookAuth() {
-        //binding.facebookLoginButton.setReadPermissions("email", "public_profile");
-        binding.facebookLoginButton.setReadPermissions("email");
-        LoginManager.getInstance().registerCallback(callbackManager,
-                new FacebookCallback<LoginResult>() {
+        binding.facebookLoginButton.setPermissions("email");
+        binding.facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         handleFacebookAccessToken(loginResult.getAccessToken());
@@ -180,15 +190,14 @@ public class MainActivity extends BaseActivity {
                 });
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         callbackManager.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
         }
@@ -208,14 +217,14 @@ public class MainActivity extends BaseActivity {
         Log.d(TAG, "handleFacebookAccessToken:" + token);
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.w(TAG, "signInWithCredential:success");
-                            createUserInFirestore();
+                            getUsersList();
+                            //createUserInFirestore();
                             updateUI();
                         } else {
                             // If sign in fails, display a message to the user.
@@ -235,7 +244,8 @@ public class MainActivity extends BaseActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            createUserInFirestore();
+                            //createUserInFirestore();
+                            getUsersList();
                             updateUI();
                         } else {
                             // If sign in fails, display a message to the user.
@@ -247,9 +257,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void updateUI() {
-        if (isCurrentUserLogged()) {
-            startNavigationActivity();
-        }
+        startNavigationActivity();
     }
 
 
@@ -265,16 +273,32 @@ public class MainActivity extends BaseActivity {
     // REST REQUEST
     // --------------------
 
-    private void createUserInFirestore() {
+    private void getUsersList() {
+        firestoreUserViewModel.getUsersList().observe(this, new Observer<List<UserFirebase>>() {
+            @Override
+            public void onChanged(List<UserFirebase> userFirebases) {
+                boolean registered = false;
+                for (UserFirebase user : userFirebases) {
+                    String userID = user.getUid();
+                    if (userID.equals(getCurrentUser().getUid())) {
+                        registered = true;
+                        break;
+                    }
+                }
+                if(!registered){
+                    createUserInFirestore();
+                }
+            }
+        });
+    }
 
-        //todo verify the user in the database before adding
-        if (isCurrentUserLogged()) {
-            String urlPicture = (getCurrentUser().getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;
-            String username = getCurrentUser().getDisplayName();
-            String uid = getCurrentUser().getUid();
-            String radius = "1000";
-            firestoreUserViewModel.createUser(uid, username, urlPicture, radius);
-        }
+    private void createUserInFirestore() {
+        String urlPicture = (getCurrentUser().getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;
+        String username = getCurrentUser().getDisplayName();
+        String uid = getCurrentUser().getUid();
+        String radius = "1000";
+        firestoreUserViewModel.createUser(uid, username, urlPicture, radius);
+
     }
 
     // NOTIFICATION
@@ -287,15 +311,16 @@ public class MainActivity extends BaseActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-        //calendar.set(Calendar.MINUTE, 15);
+        //calendar.set(Calendar.MINUTE, 13);
 
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
         Log.e("MainActivity", "SetExact alarm launched");
-        Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();;
+        Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();
+
     }
 
     // Method to cancel workManager if this setting is implemented
-    private void cancelNotification(){
+    private void cancelNotification() {
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         // Work cancel
         String workID = "notificationWorkID";

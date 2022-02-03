@@ -5,10 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,7 +59,7 @@ public class WorkmatesFragment extends Fragment {
 
         ProgressDialog loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecoveWorkmates), true);
 
-        Injection.provideFirestoreUserViewModel(getActivity()).getWorkmatesList().observe(requireActivity(), new Observer<List<UserFirebase>>() {
+        Injection.provideFirestoreUserViewModel(getActivity()).getUsersList().observe(requireActivity(), new Observer<List<UserFirebase>>() {
             @Override
             public void onChanged(List<UserFirebase> users) {
                 WorkmatesFragment.this.workmatesList.clear();

@@ -40,7 +40,9 @@ import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.auth.api.Auth;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
 import com.guillaume.myapplication.databinding.ActivityNavigationBinding;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
@@ -142,6 +144,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         setCurrentUser();
     }
 
+    //todo met la methode dans onCreate
     @Override
     protected void onResume() {
         super.onResume();
@@ -151,7 +154,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 public void onChanged(UserFirebase userFirebase) {
                     mCurrentUser = userFirebase;
                     String radiusString = userFirebase.getCurrentRadius();
-                    mRadius = Integer.parseInt(radiusString);
+                    if(radiusString != null){
+                        mRadius = Integer.parseInt(radiusString);
+                    }
                 }
             });
         }
@@ -254,10 +259,17 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 openSettings();
                 break;
             case R.id.nav_log_out:
-                //todo verify this
-                //FirebaseAuth.getInstance().signOut();
-                finish();
-                AuthUI.getInstance().signOut(this);
+                //todo deco and can choose an other google account
+                mCurrentUser = null;
+                FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+                    @Override
+                    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                        if(firebaseAuth.getCurrentUser() == null){
+                            finish();
+                        }
+                    }
+                });
+                FirebaseAuth.getInstance().signOut();
                 break;
 
             case R.id.navigation_map:
@@ -478,7 +490,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
                     String progressText = sProgress + mRadius + "/" + seekBar.getMax();
-                    String stoppedSeekBar = "Stopped tracking seekbar";
+                    String stoppedSeekBar = getString(R.string.Stopped_tracking_seekbar);
                     radiusText.setText(progressText);
                     Toast.makeText(getApplicationContext(), stoppedSeekBar, Toast.LENGTH_SHORT).show();
 
@@ -519,7 +531,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                     int currentRadius = radiusBar.getProgress();
                     String finalRadius = String.valueOf(currentRadius);
                     firestoreUserViewModel.updateRadius(currentUser.getUid(), finalRadius);
-                    //showMapFragment();
                     utilsViewModel.refreshMap(finalRadius);
                     dialog.cancel();
                 }

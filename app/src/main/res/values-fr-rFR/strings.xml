@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Go4Lunch</string>
+    <string name="title_map">Carte</string>
+    <string name="title_restaurants_list">Liste</string>
+    <string name="title_workmates">Collègues</string>
+    <string name="info_no_email_found">Aucun email trouvé</string>
+    <string name="info_no_username_found">Aucun nom d\'utilisateur trouvé</string>
+    <string name="error">Il y a une erreur dans le processus d\'authentification.</string>
+    <string name="your_lunch">Ton restaurant</string>
+    <string name="settings">Paramètre</string>
+    <string name="log_out">Se déconnecter</string>
+    <string name="logo_text">Trouve un restaurant et invite tes collègues à manger !</string>
+    <string name="locationNotGranted">Veuillez permettre la localisation</string>
+    <string name="error_unknown_error">Apparition d\'une erreur inconnue</string>
+    <string name="likeTextRestaurantProfilValidate">Tu aimes</string>
+    <string name="NavigationChooseRestaurant">Veuillez choisir un restaurant</string>
+    <string name="changing_scope">Changer la portée</string>
+    <string name="progress">Chargement</string>
+    <string name="settings_dialog_title">Sélectionnez la portée de recherche de récupération des restaurants :</string>
+    <string name="search_title">Recherche</string>
+    <string name="search_hint">Rechercher un restaurant</string>
+    <string name="wormateNoChooseRestaurant">Ce collègue n\'as pas encore choisi de restaurant</string>
+    <string name="workmates_chat">Chat des collègues</string>
+    <string name="compose_your_message">Composer votre message</string>
+    <string name="send">Envoyer</string>
+    <string name="workmates_chat_string">Chat des collègues</string>
+    <string name="notification_actived">Notification activée</string>
+</resources>

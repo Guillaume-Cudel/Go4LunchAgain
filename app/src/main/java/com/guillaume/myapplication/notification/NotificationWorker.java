@@ -15,6 +15,7 @@ import androidx.concurrent.futures.ResolvableFuture;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.work.ListenableWorker;
+import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.android.volley.Response;
@@ -34,7 +35,7 @@ import java.util.List;
 
 import javax.security.auth.callback.Callback;
 
-public class NotificationWorker extends ListenableWorker {
+public class NotificationWorker extends Worker {
 
     private final CharSequence name = "Channel 1";
     private Restaurant mRestaurant;
@@ -55,6 +56,20 @@ public class NotificationWorker extends ListenableWorker {
     }
 
     @NonNull
+    @Override
+    public Result doWork() {
+        Context applicationContext = getApplicationContext();
+
+        try {
+            recoveData(userID, applicationContext);
+            return Result.success();
+        } catch (Throwable throwable) {
+            Log.e(TAG, "Error applying notification", throwable);
+            return Result.failure();
+        }
+    }
+
+    /*@NonNull
     @Override
     public ListenableFuture<Result> startWork() {
         //todo finish to set it
@@ -82,7 +97,7 @@ public class NotificationWorker extends ListenableWorker {
 
             return callback;
         });
-    }
+    }*/
 
 
     private void recoveData(String userID, Context context) {
@@ -110,6 +125,7 @@ public class NotificationWorker extends ListenableWorker {
             @Override
             public void onSuccess(Restaurant restaurant) {
                 mRestaurant = restaurant;
+                // todo appeller recoveAllWorkmates ici
             }
 
             @Override
@@ -147,7 +163,6 @@ public class NotificationWorker extends ListenableWorker {
     private void sendNotification(Context context) {
 
         convertWorkmatesToString();
-        //todo fix bug with name send 2 times
         StringBuilder wNames = new StringBuilder();
 
         String prefix = ", ";

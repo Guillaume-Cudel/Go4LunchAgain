@@ -5,21 +5,22 @@
     <string name="title_workmates">Workmates</string>
 
     <!-- Used in NavigationDrawer -->
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
     <string name="info_no_email_found">No email found</string>
     <string name="info_no_username_found">No username found</string>
 
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
-    <string name="facebook_application_id">444475107297015</string>
-    <string name="fb_login_protocol_scheme">fb444475107297015</string>
+    <string name="facebook_app_id" translatable="false">444475107297015</string>
+    <!--<string name="fb_login_protocol_scheme">fb444475107297015</string>-->
+    <string name="fb_login_protocol_scheme" translatable="false">e7caf7f64796886d00c3d75468de7c01</string>
+    <!--Google id-->
+    <string name="default_web_client_id2" translatable="false">592874646595-m2jbab04la6g5r0j270q9nsnnt7grkoi.apps.googleusercontent.com</string>
 
-    <string name="AUTH_ID">899120232217-l5resnanl78699lve2vkshbsdcgr6sd3.apps.googleusercontent.com</string>
 
-
-    <string name="API_KEY">AIzaSyCfIzqvYUkoerRn0a3nnUsLcpooxnZElxI</string>
-    <string name="success">Authentification success</string>
-    <string name="canceled">Authentification canceled</string>
+    <string name="API_KEY" translatable="false">AIzaSyCfIzqvYUkoerRn0a3nnUsLcpooxnZElxI</string>
+    <string name="success" translatable="false">Authentification success</string>
+    <string name="canceled" translatable="false">Authentification canceled</string>
     <string name="error">There is an error to the authentification process</string>
     <string name="your_lunch">Your lunch</string>
     <string name="settings">Settings</string>
@@ -28,14 +29,14 @@
     <string name="locationNotGranted">Please grant the location permission</string>
     <string name="error_unknown_error"> A unknow error has appeared</string>
     <string name="likeTextRestaurantProfilValidate">You like</string>
-    <string name="likeTextRestaurantProfilInvalidate">Like</string>
-    <string name="messageRecovingRestaurants">Recoving restaurants</string>
-    <string name="messageRecoveWorkmates">Recoving workmates</string>
+    <string name="likeTextRestaurantProfilInvalidate" translatable="false">Like</string>
+    <string name="messageRecovingRestaurants" translatable="false">Recoving restaurants</string>
+    <string name="messageRecoveWorkmates" translatable="false">Recoving workmates</string>
     <string name="NavigationChooseRestaurant">Please, choose a restaurant.</string>
     <string name="changing_scope">Changing scope</string>
     <string name="progress">Progress: </string>
-    <string name="start_seekBar">Started tracking seekbar</string>
-    <string name="settings_dialog_title">Select the scope of restaurants recovery :</string>
+    <string name="start_seekBar" translatable="false">Started tracking seekbar</string>
+    <string name="settings_dialog_title">Select the searching scope of restaurants recovery :</string>
     <string name="search_title">search</string>
     <string name="search_hint">Look for a restaurant</string>
     <string name="wormateNoChooseRestaurant">This workmate doesn\'t have choose a restaurant yet</string>
@@ -47,7 +48,8 @@
     // Notification
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
     <string name="notification_actived">Notification Actived</string>
-    <string name="notification_canceled">Notification canceled</string>
+    <string name="notification_canceled" translatable="false">Notification canceled</string>
+    <string name="Stopped_tracking_seekbar">Stopped tracking seekbar</string>
 
 
 </resources>

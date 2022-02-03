@@ -29,13 +29,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         applyNotificationPeriodically();
     }
 
-    private void applyNotification() {
-        mWorkManager.enqueue(OneTimeWorkRequest.from(NotificationWorker.class));
-        /*mWorkManager.enqueue(new OneTimeWorkRequest.Builder(NotificationWorker.class)
-                .setInitialDelay(1, TimeUnit.MINUTES)
-                .build());*/
-    }
-
     private void applyNotificationPeriodically() {
         mWorkManager.enqueue(new PeriodicWorkRequest.Builder(NotificationWorker.class, 1, TimeUnit.DAYS)
                 //.setInitialDelay(1, TimeUnit.MINUTES)
