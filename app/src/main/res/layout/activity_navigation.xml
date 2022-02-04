@@ -22,8 +22,25 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:background="@color/orange"
         app:headerLayout="@layout/nav_header_navigation"
-        app:menu="@menu/activity_navigation_menu_drawer" />
+        app:menu="@menu/activity_navigation_menu_drawer">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/ic_baseline_outdoor_grill_24"/>
+
+    </LinearLayout>
+</com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>
