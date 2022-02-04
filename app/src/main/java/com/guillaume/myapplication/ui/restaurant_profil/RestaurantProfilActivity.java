@@ -1,23 +1,15 @@
 package com.guillaume.myapplication.ui.restaurant_profil;
 
-import static com.guillaume.myapplication.R.string.notification_actived;
-import static com.guillaume.myapplication.R.string.notification_canceled;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.work.WorkManager;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,32 +20,25 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.guillaume.myapplication.NavigationActivity;
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Details;
-import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
-import com.guillaume.myapplication.notification.AlarmReceiver;
 import com.guillaume.myapplication.ui.BaseActivity;
 import com.guillaume.myapplication.viewModel.FirestoreRestaurantViewModel;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.guillaume.myapplication.viewModel.RestaurantViewModel;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class RestaurantProfilActivity extends BaseActivity {
@@ -86,7 +71,6 @@ public class RestaurantProfilActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profil_restaurant);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null){
@@ -284,7 +268,7 @@ public class RestaurantProfilActivity extends BaseActivity {
         }
 
         if (photoReference == null) {
-            Glide.with(context).load(R.drawable.restaurantjardin).into(restaurantPhoto);
+            Glide.with(context).load(R.drawable.gardenrestaurant).into(restaurantPhoto);
         } else {
             Glide.with(context).load(parseDataPhotoToImage())
                     .into(restaurantPhoto);

@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -40,10 +41,7 @@ import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.auth.api.Auth;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
-import com.guillaume.myapplication.databinding.ActivityNavigationBinding;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
@@ -78,8 +76,9 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class NavigationActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,
         SearchView.OnQueryTextListener, SearchView.OnSuggestionListener {
 
-    private ActivityNavigationBinding binding;
     private BottomNavigationView mBottomNavigationView;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationDrawerNavView;
     private UtilsViewModel utilsViewModel;
     private FirestoreUserViewModel firestoreUserViewModel;
     private LocationCallback locationCallback;
@@ -98,7 +97,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     private static final int FRAGMENT_RESTAURANT = 1;
     private static final int FRAGMENT_WORKMATES = 2;
     private static final int DELTA_VALUE = 500;
-
     // Easy location
     private static final int REQUEST_LOCATION_PERMISSION = 10;
 
@@ -113,12 +111,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityNavigationBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
 
-
-        mBottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_bottom_nav_view);
+        mBottomNavigationView = findViewById(R.id.navigation_bottom_nav_view);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationDrawerNavView = findViewById(R.id. navigation_drawer_nav_view);
 
         utilsViewModel = Injection.provideUtilsViewModel(this);
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
@@ -134,9 +130,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         // Toolbar configuration
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout,
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout,
                 toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        binding.drawerLayout.addDrawerListener(toggle);
+        drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         updateUIWhenCreating();
@@ -144,26 +140,6 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         setCurrentUser();
         recoveRadius();
     }
-
-    //todo put method in onCreate
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        if(currentUser != null) {
-            firestoreUserViewModel.getUser(currentUser.getUid()).observe(this, new Observer<UserFirebase>() {
-                @Override
-                public void onChanged(UserFirebase userFirebase) {
-                    mCurrentUser = userFirebase;
-                    String radiusString = userFirebase.getCurrentRadius();
-                    if(radiusString != null){
-                        mRadius = Integer.parseInt(radiusString);
-                    }
-                }
-            });
-        }
-
-        recoveCurrentRestaurantsDisplayed();
-    }*/
 
     private void recoveRadius(){
         if(currentUser != null) {
@@ -178,17 +154,16 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 }
             });
         }
-
         recoveCurrentRestaurantsDisplayed();
     }
 
     // UI
 
     private void updateUIWhenCreating() {
-        View header = binding.navigationDrawerNavView.getHeaderView(0);
-        ImageView profilImage = (ImageView) header.findViewById(R.id.profilImage);
-        TextView profilUsername = (TextView) header.findViewById(R.id.profil_name);
-        TextView profilUsermail = (TextView) header.findViewById(R.id.profil_mail);
+        View header = navigationDrawerNavView.getHeaderView(0);
+        ImageView profilImage = header.findViewById(R.id.profilImage);
+        TextView profilUsername = header.findViewById(R.id.profil_name);
+        TextView profilUsermail = header.findViewById(R.id.profil_mail);
 
         if (currentUser != null) {
 
@@ -214,8 +189,8 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     @Override
     public void onBackPressed() {
         //  Handle back click to close menu
-        if (this.binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            this.binding.drawerLayout.closeDrawer(GravityCompat.START);
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -241,7 +216,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
     }
 
     private void onClickItemsDrawer() {
-        NavigationView navView = binding.navigationDrawerNavView;
+        NavigationView navView = navigationDrawerNavView;
         if (navView != null) {
             setupDrawerContent(navView);
         }
@@ -262,7 +237,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
         //  Handle Navigation Item Click
         int id = item.getItemId();
         item.setChecked(true);
-        binding.drawerLayout.closeDrawers();
+        drawerLayout.closeDrawers();
 
         switch (id) {
             case R.id.nav_your_lunch:
@@ -306,7 +281,7 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             default:
                 break;
         }
-        this.binding.drawerLayout.closeDrawer(GravityCompat.START);
+        this.drawerLayout.closeDrawer(GravityCompat.START);
 
         return true;
     }

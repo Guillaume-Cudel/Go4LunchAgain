@@ -20,9 +20,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.work.WorkManager;
 
+import com.facebook.login.widget.LoginButton;
 import com.google.firebase.auth.FirebaseUser;
-import com.guillaume.myapplication.R;
-import com.guillaume.myapplication.databinding.ActivityMainBinding;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
 import com.guillaume.myapplication.notification.AlarmReceiver;
@@ -32,7 +31,6 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -47,8 +45,6 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Calendar;
@@ -60,13 +56,15 @@ public class MainActivity extends BaseActivity {
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 123;
 
-    ActivityMainBinding binding;
     private CallbackManager callbackManager;
     GoogleSignInClient gsi;
     private FirebaseAuth mAuth;
     private FirestoreUserViewModel firestoreUserViewModel;
     private PendingIntent alarmIntent;
     private WorkManager mWorkManager;
+    private SignInButton googleSignInButton;
+    private LoginButton facebookLoginButton;
+    private ConstraintLayout mainActivityLayout;
 
 
     @Override
@@ -79,9 +77,9 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
+        googleSignInButton = findViewById(R.id.google_signIn_button);
+        facebookLoginButton= findViewById(R.id.facebook_login_button);
+        mainActivityLayout = findViewById(R.id.main_activity_layout);
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -92,9 +90,7 @@ public class MainActivity extends BaseActivity {
         firestoreUserViewModel = Injection.provideFirestoreUserViewModel(this);
         mAuth = FirebaseAuth.getInstance();
 
-        //configureGoogleAuth();
-
-        binding.googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
+        googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
         onClickGoogleButton();
         onClickFacebookButton();
 
@@ -104,19 +100,8 @@ public class MainActivity extends BaseActivity {
 
     // ACTION
 
-
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        configureGoogleAuth();
-
-        binding.googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
-        onClickGoogleButton();
-        onClickFacebookButton();
-    }*/
-
     private void onClickGoogleButton() {
-        binding.googleSignInButton.setOnClickListener(new View.OnClickListener() {
+        googleSignInButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
@@ -127,7 +112,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void onClickFacebookButton() {
-        binding.facebookLoginButton.setOnClickListener(new View.OnClickListener() {
+        facebookLoginButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
@@ -174,8 +159,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void configureFacebookAuth() {
-        binding.facebookLoginButton.setPermissions("email");
-        binding.facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+        facebookLoginButton.setPermissions("email");
+        facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         handleFacebookAccessToken(loginResult.getAccessToken());
@@ -183,12 +168,12 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public void onCancel() {
-                        showSnackBar(binding.mainActivityLayout, getString(R.string.canceled));
+                        showSnackBar(mainActivityLayout, getString(R.string.canceled));
                     }
 
                     @Override
                     public void onError(FacebookException exception) {
-                        showSnackBar(binding.mainActivityLayout, getString(R.string.error));
+                        showSnackBar(mainActivityLayout, getString(R.string.error));
                     }
                 });
     }
@@ -232,7 +217,7 @@ public class MainActivity extends BaseActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            showSnackBar(binding.mainActivityLayout, getString(R.string.error));
+                            showSnackBar(mainActivityLayout, getString(R.string.error));
                         }
                     }
                 });
@@ -258,14 +243,6 @@ public class MainActivity extends BaseActivity {
                     }
                 });
     }
-
-    /*AuthCredential credential = EmailAuthProvider
-            .getCredential("user@example.com", "password1234");*/
-
-
-
-
-
 
     private void updateUI(FirebaseUser user) {
         if(user != null){

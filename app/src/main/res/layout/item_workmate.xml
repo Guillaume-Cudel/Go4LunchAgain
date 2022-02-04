@@ -12,7 +12,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="20dp"
         android:layout_marginTop="@dimen/ten"
-        android:src="@drawable/go4lunch_background"/>
+        android:src="@drawable/ic_user_profile"/>
 
     <TextView
         android:id="@+id/workmate_text_item"

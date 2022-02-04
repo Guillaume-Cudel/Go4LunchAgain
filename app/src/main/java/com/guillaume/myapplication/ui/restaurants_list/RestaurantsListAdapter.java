@@ -21,10 +21,7 @@ import com.bumptech.glide.Glide;
 import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.ui.restaurant_profil.RestaurantProfilActivity;
 import com.guillaume.myapplication.model.Restaurant;
-import com.guillaume.myapplication.model.requests.Photos;
 import com.google.android.gms.maps.model.LatLng;
-
-import org.w3c.dom.Text;
 
 import java.util.Calendar;
 import java.util.List;
@@ -116,7 +113,7 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
             Glide.with(context).load(parseDataPhotoToImage())
                     .into(holder.imageField);
         }else{
-            Glide.with(context).load(R.drawable.restaurantjardin).into(holder.imageField);
+            Glide.with(context).load(R.drawable.gardenrestaurant).into(holder.imageField);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
