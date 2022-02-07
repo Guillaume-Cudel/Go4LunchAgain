@@ -466,8 +466,11 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
             builder.setView(customWindow);
 
             radiusBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                int progress = 0;
+
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
+                    progress = progressValue;
                     String changingSeekBar = getString(R.string.changing_scope);
                     String progressTextChanged = sProgress + progressValue + "/" + radiusBar.getMax();
                     radiusText.setText(progressTextChanged);
@@ -476,16 +479,14 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
 
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {
-                    String startSeekBar = getString(R.string.start_seekBar);
-                    Toast.makeText(getApplicationContext(), startSeekBar, Toast.LENGTH_SHORT).show();
+                    /*String startSeekBar = getString(R.string.start_seekBar);
+                    Toast.makeText(getApplicationContext(), startSeekBar, Toast.LENGTH_SHORT).show();*/
                 }
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
-                    String progressText = sProgress + mRadius + "/" + seekBar.getMax();
-                    String stoppedSeekBar = getString(R.string.Stopped_tracking_seekbar);
-                    radiusText.setText(progressText);
-                    Toast.makeText(getApplicationContext(), stoppedSeekBar, Toast.LENGTH_SHORT).show();
+                    String progressTextChanged = sProgress + progress + "/" + radiusBar.getMax();
+                    radiusText.setText(progressTextChanged);
 
                 }
             });

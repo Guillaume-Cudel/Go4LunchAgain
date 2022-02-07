@@ -40,6 +40,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RestaurantProfilActivity extends BaseActivity {
 
@@ -58,8 +59,7 @@ public class RestaurantProfilActivity extends BaseActivity {
     private Context context;
     private FirestoreUserViewModel fUserViewModel;
     private FirestoreRestaurantViewModel fRestaurantViewModel;
-    private FirebaseUser currentUser = this.getCurrentUser();
-    private String userUid = currentUser.getUid();
+    private final String userUid = Objects.requireNonNull(this.getCurrentUser()).getUid();
 
     private static final int REQUEST_CALL_PHONE_PERMISSION = 100;
 

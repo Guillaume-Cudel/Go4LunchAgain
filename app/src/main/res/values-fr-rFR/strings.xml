@@ -15,7 +15,7 @@
     <string name="error_unknown_error">Apparition d\'une erreur inconnue</string>
     <string name="likeTextRestaurantProfilValidate">Tu aimes</string>
     <string name="NavigationChooseRestaurant">Veuillez choisir un restaurant</string>
-    <string name="changing_scope">Changer la portée</string>
+    <string name="changing_scope">Portée modifiée</string>
     <string name="progress">"Portée: "</string>
     <string name="settings_dialog_title">Sélectionnez la portée de recherche des restaurants :</string>
     <string name="search_title">Recherche</string>

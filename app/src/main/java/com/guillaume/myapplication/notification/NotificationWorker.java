@@ -30,7 +30,11 @@ import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
 
 import java.io.IOException;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.security.auth.callback.Callback;
@@ -107,8 +111,9 @@ public class NotificationWorker extends Worker {
         RestaurantHelper.getAllUsers(restaurantID, new RestaurantHelper.GetAllUsersCallback() {
             @Override
             public void onSuccess(List<UserFirebase> list) {
+                boolean timeOk = verifyTime();
                 workmates = list;
-                if(workmates.size() > 0 && mRestaurant != null) {
+                if(workmates.size() > 0 && timeOk) {
                     sendNotification(context);
                 }
             }
@@ -125,6 +130,34 @@ public class NotificationWorker extends Worker {
         for (int i = 0; i < workmates.size(); i++) {
             workmatesName.add(workmates.get(i).getUsername());
         }
+    }
+
+
+    private boolean verifyTime(){
+        boolean middle = false;
+        //--------------------
+
+        // ------------
+        Calendar calendar = Calendar.getInstance();
+        Calendar current = Calendar.getInstance();
+
+        current.setTimeInMillis(System.currentTimeMillis());
+        Date now = current.getTime();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 0);
+        Date min = calendar.getTime();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 2);
+        Date max = calendar.getTime();
+
+        if(now.compareTo(min) >= 0){
+            if(now.compareTo(max) <= 0 )
+                middle = true;
+            Log.e(TAG, "It's OK !!");
+        }
+        return middle;
     }
 
 

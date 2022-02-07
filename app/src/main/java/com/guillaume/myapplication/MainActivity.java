@@ -62,6 +62,7 @@ public class MainActivity extends BaseActivity {
     private FirestoreUserViewModel firestoreUserViewModel;
     private PendingIntent alarmIntent;
     private WorkManager mWorkManager;
+    private AlarmManager alarmManager;
     private SignInButton googleSignInButton;
     private LoginButton facebookLoginButton;
     private ConstraintLayout mainActivityLayout;
@@ -84,6 +85,7 @@ public class MainActivity extends BaseActivity {
         callbackManager = CallbackManager.Factory.create();
 
         mWorkManager = WorkManager.getInstance(this);
+        //alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
@@ -133,14 +135,11 @@ public class MainActivity extends BaseActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         if (isCurrentUserLogged()) {
-            cancelNotification();
-            startAlarm();
             updateUI(getCurrentUser());
         }
     }
@@ -206,6 +205,7 @@ public class MainActivity extends BaseActivity {
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
@@ -214,6 +214,8 @@ public class MainActivity extends BaseActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             getUsersList(user);
                             updateUI(user);
+                            cancelNotification();
+                            startAlarm();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -227,6 +229,7 @@ public class MainActivity extends BaseActivity {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
@@ -234,6 +237,8 @@ public class MainActivity extends BaseActivity {
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             getUsersList(user);
+                            cancelNotification();
+                            startAlarm();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -296,15 +301,14 @@ public class MainActivity extends BaseActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void startAlarm() {
 
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-        //calendar.set(Calendar.MINUTE, 13);
+        calendar.set(Calendar.MINUTE, 0);
 
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
         Log.e("MainActivity", "SetExact alarm launched");
-        Toast.makeText(this, notification_actived, Toast.LENGTH_SHORT).show();
 
     }
 
@@ -312,8 +316,8 @@ public class MainActivity extends BaseActivity {
     private void cancelNotification() {
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         // Work cancel
-        String workID = "notificationWorkID";
-        mWorkManager.cancelAllWorkByTag(workID);
+        //String workID = "notificationWorkID";
+        //mWorkManager.cancelAllWorkByTag(workID);
         // Alarm cancel
         manager.cancel(alarmIntent);
     }

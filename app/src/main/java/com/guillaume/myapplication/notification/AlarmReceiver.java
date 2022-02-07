@@ -1,5 +1,6 @@
 package com.guillaume.myapplication.notification;
 
+import android.app.AlarmManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 public class AlarmReceiver extends BroadcastReceiver {
@@ -24,16 +26,15 @@ public class AlarmReceiver extends BroadcastReceiver {
         mWorkManager = WorkManager.getInstance(context);
 
         Log.e(TAG, "Alarm's running");
-        //todo put the good work request after the test
-        //applyNotification();
         applyNotificationPeriodically();
     }
 
     private void applyNotificationPeriodically() {
-        mWorkManager.enqueue(new PeriodicWorkRequest.Builder(NotificationWorker.class, 1, TimeUnit.DAYS)
+        /*mWorkManager.enqueue(new PeriodicWorkRequest.Builder(NotificationWorker.class, 1, TimeUnit.DAYS)
                 //.setInitialDelay(1, TimeUnit.MINUTES)
                 .addTag(workID)
-                .build());
+                .build());*/
+        mWorkManager.enqueue(OneTimeWorkRequest.from(NotificationWorker.class));
         Log.e(TAG, "Send notification all days");
     }
 }
