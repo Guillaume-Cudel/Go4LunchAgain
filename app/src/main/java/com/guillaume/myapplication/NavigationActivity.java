@@ -473,10 +473,10 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
                     progress = progressValue;
-                    String changingSeekBar = getString(R.string.changing_scope);
+                    //String changingSeekBar = getString(R.string.changing_scope);
                     String progressTextChanged = sProgress + progressValue + "/" + radiusBar.getMax();
                     radiusText.setText(progressTextChanged);
-                    Toast.makeText(getApplicationContext(), changingSeekBar, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), changingSeekBar, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override

@@ -96,20 +96,20 @@
         android:id="@+id/list_view_number_workmates"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/list_view_image"
+        app:layout_constraintStart_toEndOf="@id/list_view_workmates_image"
         app:layout_constraintBottom_toBottomOf="@id/list_view_kind_restaurant"
+        android:layout_marginStart="-3dp"
         android:text="(0)"
         android:textStyle="bold"
-        android:textSize="12sp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="@dimen/five"/>
+        android:textSize="12sp" />
 
     <ImageView
         android:id="@+id/list_view_workmates_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/list_view_number_workmates"
+        app:layout_constraintEnd_toEndOf="@id/list_view_distance"
         app:layout_constraintTop_toTopOf="@id/list_view_kind_restaurant"
+        android:layout_marginEnd="10dp"
         android:src="@drawable/ic_baseline_perm_identity_20" />
 
     <ImageView

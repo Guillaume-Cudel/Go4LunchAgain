@@ -33,12 +33,15 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
     private String photoData, photoWidth, rating, restaurantLatitude, restaurantLongitude;
     private LatLng mlatlng;
     private Restaurant restaurant;
+    private RestaurantListClickInterface restaurantListClickInterface;
 
 
-    public RestaurantsListAdapter(final List<Restaurant> dataList, LatLng latlng, Context context) {
+    public RestaurantsListAdapter(final List<Restaurant> dataList, LatLng latlng, Context context,
+                                  RestaurantListClickInterface restaurantListClickInterface) {
         this.dataList = dataList;
         this.mlatlng = latlng;
         this.context = context;
+        this.restaurantListClickInterface = restaurantListClickInterface;
     }
 
     @NonNull
@@ -51,7 +54,7 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
     @Override
     public void onBindViewHolder(RestaurantsListViewHolder holder, int position) {
 
-        restaurant = dataList.get(holder.getAdapterPosition());
+        restaurant = dataList.get(holder.getBindingAdapterPosition());
         String placeID = restaurant.getPlace_id();
         rating = restaurant.getRating();
         restaurantLatitude = restaurant.getGeometry().getLocation().getLat();
@@ -100,7 +103,6 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
             holder.participantsIcon.setVisibility(View.INVISIBLE);
             holder.participantsField.setVisibility(View.INVISIBLE);
         }
-        
 
         String distance = getDistanceInMeters() + " m";
         holder.distanceField.setText(distance);
@@ -116,7 +118,7 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
             Glide.with(context).load(R.drawable.gardenrestaurant).into(holder.imageField);
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        /*holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(context, RestaurantProfilActivity.class);
@@ -132,7 +134,7 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
                 ((Activity) context).startActivity(i);
 
             }
-        });
+        });*/
 
     }
 
@@ -188,6 +190,14 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
             noteField1 = mView.findViewById(R.id.list_view_star_1);
             noteField2 = mView.findViewById(R.id.list_view_star_2);
             noteField3 = mView.findViewById(R.id.list_view_star_3);
+
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    restaurantListClickInterface.onItemClick(getBindingAdapterPosition());
+                }
+            });
         }
 
         private void displayStarsRating() {

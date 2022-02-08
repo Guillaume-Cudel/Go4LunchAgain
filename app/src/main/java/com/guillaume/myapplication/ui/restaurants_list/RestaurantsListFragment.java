@@ -1,6 +1,7 @@
 package com.guillaume.myapplication.ui.restaurants_list;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +21,7 @@ import com.guillaume.myapplication.R;
 import com.guillaume.myapplication.di.Injection;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
+import com.guillaume.myapplication.ui.restaurant_profil.RestaurantProfilActivity;
 import com.guillaume.myapplication.viewModel.FirestoreRestaurantViewModel;
 import com.guillaume.myapplication.viewModel.FirestoreUserViewModel;
 import com.guillaume.myapplication.viewModel.UtilsViewModel;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class RestaurantsListFragment extends Fragment {
+public class RestaurantsListFragment extends Fragment implements RestaurantListClickInterface {
 
 
 
@@ -40,13 +41,12 @@ public class RestaurantsListFragment extends Fragment {
     private final ArrayList<Restaurant> restaurantsList = new ArrayList<>();
     private ArrayList<Restaurant> filteredRestaurantsList = new ArrayList<>();
     private LatLng mLatlng;
-    private RestaurantsListAdapter adapter = new RestaurantsListAdapter(restaurantsList, mLatlng, this.getActivity());
+    private RestaurantsListAdapter adapter = new RestaurantsListAdapter(restaurantsList, mLatlng, this.getActivity(), this);
     private FirestoreRestaurantViewModel mFirestoreRestaurantVM;
     private FirestoreUserViewModel mFirestoreUserVM;
+    private UtilsViewModel utilsVM;
     private ProgressDialog loading;
-    private String mRadius;
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private FirebaseUser authUser = mAuth.getCurrentUser();
+    private FirebaseUser authUser = FirebaseAuth.getInstance().getCurrentUser();
 
 
     public RestaurantsListFragment( ) {
@@ -61,11 +61,11 @@ public class RestaurantsListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         loading = ProgressDialog.show(getActivity(), "", getString(R.string.messageRecovingRestaurants), true);
-        mFirestoreRestaurantVM = Injection.provideFirestoreRestaurantViewModel(getActivity());
-        mFirestoreUserVM = Injection.provideFirestoreUserViewModel(getActivity());
+        mFirestoreRestaurantVM = Injection.provideFirestoreRestaurantViewModel(requireActivity());
+        mFirestoreUserVM = Injection.provideFirestoreUserViewModel(requireActivity());
+        utilsVM = Injection.provideUtilsViewModel(requireActivity());
 
         recoveLocation();
-        recoveRadius();
         configureRecyclerView();
 
     }
@@ -78,43 +78,42 @@ public class RestaurantsListFragment extends Fragment {
         return view;
     }
 
-    private void recoveRadius(){
-        mFirestoreUserVM.getUser(authUser.getUid()).observe(requireActivity(), new Observer<UserFirebase>() {
-            @Override
-            public void onChanged(UserFirebase userFirebase) {
-                mRadius = userFirebase.getCurrentRadius();
-                recoveAllRestaurants();
-            }
-        });
-    }
-
     private void recoveLocation(){
-
-        UtilsViewModel utilsViewModel = new ViewModelProvider(requireActivity()).get(UtilsViewModel.class);
-        utilsViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
+        utilsVM.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
             @Override
             public void onChanged(LatLng latLng) {
                 mLatlng = latLng;
-                updateLocation();
+                updateLocation(mLatlng);
+                recoveRadius();
             }
         });
     }
 
-    private void recoveAllRestaurants(){
-        mFirestoreRestaurantVM.getAllRestaurants().observe(requireActivity(), new Observer<List<Restaurant>>() {
+    private void recoveRadius(){
+        mFirestoreUserVM.getUser(authUser.getUid()).observe(Objects.requireNonNull(getActivity()), new Observer<UserFirebase>() {
+            @Override
+            public void onChanged(UserFirebase userFirebase) {
+                String mRadius = userFirebase.getCurrentRadius();
+                recoveAllRestaurants(mRadius);
+            }
+        });
+    }
+
+    private void recoveAllRestaurants(String radius){
+        mFirestoreRestaurantVM.getAllRestaurants().observe(Objects.requireNonNull(getActivity()), new Observer<List<Restaurant>>() {
             @Override
             public void onChanged(List<Restaurant> restaurants) {
                 RestaurantsListFragment.this.restaurantsList.clear();
                 RestaurantsListFragment.this.restaurantsList.addAll(restaurants);
-                filterRestaurantsWithinReach();
-                updateRestaurants();
+                filterRestaurantsWithinReach(radius);
                 loading.cancel();
             }
         });
     }
 
-    private void filterRestaurantsWithinReach(){
-        int radius = Integer.parseInt(mRadius);
+    private void filterRestaurantsWithinReach(String sRadius){
+        filteredRestaurantsList.clear();
+        int radius = Integer.parseInt(sRadius);
         if(restaurantsList.size() > 0){
             for(Restaurant r : restaurantsList){
                 LatLng restaurantLocation = recoveLatLng(r);
@@ -125,6 +124,7 @@ public class RestaurantsListFragment extends Fragment {
             }
 
         }
+        updateRestaurants(filteredRestaurantsList);
     }
 
     private int displayRestaurantsWithinRange(LatLng restaurantLocation) {
@@ -156,18 +156,38 @@ public class RestaurantsListFragment extends Fragment {
     private void configureRecyclerView() {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        this.adapter = new RestaurantsListAdapter(restaurantsList, mLatlng, this.getActivity());
+        this.adapter = new RestaurantsListAdapter(restaurantsList, mLatlng, this.getActivity(), this);
         recyclerView.setAdapter(adapter);
     }
 
 
-    private void updateRestaurants(){
-        adapter.updateData(filteredRestaurantsList);
+    private void updateRestaurants(List<Restaurant> filtered){
+        adapter.updateData(filtered);
     }
 
-    private void updateLocation(){
-        adapter.updateLocation(mLatlng);
+    private void updateLocation(LatLng location){
+        adapter.updateLocation(location);
     }
 
 
+    @Override
+    public void onItemClick(int position) {
+
+        Restaurant restaurant = filteredRestaurantsList.get(position);
+
+        Intent i = new Intent(getActivity(), RestaurantProfilActivity.class);
+        i.putExtra("place_id", restaurant.getPlace_id());
+        i.putExtra("name", restaurant.getName());
+        if(restaurant.getPhotoReference() != null){
+            i.putExtra("photo", restaurant.getPhotoReference());
+            i.putExtra("photoWidth", restaurant.getPhotoWidth());
+        }
+        i.putExtra("vicinity", restaurant.getVicinity());
+        i.putExtra("type", restaurant.getType());
+        if(restaurant.getRating() != null){
+            i.putExtra("rate", restaurant.getRating());
+        }
+
+        getActivity().startActivity(i);
+    }
 }
