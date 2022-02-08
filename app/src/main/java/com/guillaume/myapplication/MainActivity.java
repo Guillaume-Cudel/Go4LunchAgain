@@ -214,8 +214,8 @@ public class MainActivity extends BaseActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             getUsersList(user);
                             updateUI(user);
-                            cancelNotification();
-                            startAlarm();
+                            //cancelNotification();
+                            //startAlarm();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -237,8 +237,8 @@ public class MainActivity extends BaseActivity {
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             getUsersList(user);
-                            cancelNotification();
-                            startAlarm();
+                            //cancelNotification();
+                            //startAlarm();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -270,6 +270,7 @@ public class MainActivity extends BaseActivity {
 
     private void getUsersList(FirebaseUser fUser) {
             firestoreUserViewModel.getUsersList().observe(this, new Observer<List<UserFirebase>>() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
                 @Override
                 public void onChanged(List<UserFirebase> userFirebases) {
                     boolean registered = false;
@@ -287,12 +288,14 @@ public class MainActivity extends BaseActivity {
             });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void createUserInFirestore() {
             String urlPicture = (Objects.requireNonNull(getCurrentUser()).getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;
             String username = getCurrentUser().getDisplayName();
             String uid = getCurrentUser().getUid();
             String radius = "1000";
             firestoreUserViewModel.createUser(uid, username, urlPicture, radius);
+            startAlarm();
     }
 
     // NOTIFICATION
@@ -316,8 +319,8 @@ public class MainActivity extends BaseActivity {
     private void cancelNotification() {
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         // Work cancel
-        //String workID = "notificationWorkID";
-        //mWorkManager.cancelAllWorkByTag(workID);
+        String workID = "notificationWorkID";
+        mWorkManager.cancelAllWorkByTag(workID);
         // Alarm cancel
         manager.cancel(alarmIntent);
     }

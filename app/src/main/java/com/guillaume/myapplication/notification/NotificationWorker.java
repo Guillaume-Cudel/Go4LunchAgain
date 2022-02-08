@@ -135,9 +135,6 @@ public class NotificationWorker extends Worker {
 
     private boolean verifyTime(){
         boolean middle = false;
-        //--------------------
-
-        // ------------
         Calendar calendar = Calendar.getInstance();
         Calendar current = Calendar.getInstance();
 
@@ -149,7 +146,7 @@ public class NotificationWorker extends Worker {
         Date min = calendar.getTime();
 
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 2);
+        calendar.set(Calendar.MINUTE, 1);
         Date max = calendar.getTime();
 
         if(now.compareTo(min) >= 0){
