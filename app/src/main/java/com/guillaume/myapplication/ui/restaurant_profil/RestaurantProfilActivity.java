@@ -301,8 +301,9 @@ public class RestaurantProfilActivity extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 Intent i = new Intent(this, NavigationActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                //i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
+                this.finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);

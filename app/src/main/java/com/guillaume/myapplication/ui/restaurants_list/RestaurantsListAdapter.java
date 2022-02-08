@@ -30,7 +30,7 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
 
     private List<Restaurant> dataList;
     private final Context context;
-    private String photoData, photoWidth, rating, restaurantLatitude, restaurantLongitude;
+    private String photoData, photoWidth, restaurantLatitude, restaurantLongitude;
     private LatLng mlatlng;
     private Restaurant restaurant;
     private RestaurantListClickInterface restaurantListClickInterface;
@@ -55,8 +55,6 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
     public void onBindViewHolder(RestaurantsListViewHolder holder, int position) {
 
         restaurant = dataList.get(holder.getBindingAdapterPosition());
-        String placeID = restaurant.getPlace_id();
-        rating = restaurant.getRating();
         restaurantLatitude = restaurant.getGeometry().getLocation().getLat();
         restaurantLongitude = restaurant.getGeometry().getLocation().getLng();
 
@@ -89,7 +87,7 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
         }
 
         if (restaurant.getRating() != null) {
-            holder.displayStarsRating();
+            holder.displayStarsRating(restaurant.getRating());
         }else{
             holder.noDisplayStars();
         }
@@ -117,25 +115,6 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
         }else{
             Glide.with(context).load(R.drawable.gardenrestaurant).into(holder.imageField);
         }
-
-        /*holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(context, RestaurantProfilActivity.class);
-                i.putExtra("place_id", placeID);
-                i.putExtra("name", restaurant.getName());
-                if(restaurant.getPhotoReference() != null){
-                    i.putExtra("photo", photoData);
-                    i.putExtra("photoWidth", photoWidth);
-                }
-                i.putExtra("vicinity", restaurant.getVicinity());
-                i.putExtra("type", restaurant.getType());
-                i.putExtra("rate", rating);
-                ((Activity) context).startActivity(i);
-
-            }
-        });*/
-
     }
 
     @Override
@@ -200,8 +179,8 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
             });
         }
 
-        private void displayStarsRating() {
-            double dRating = Double.parseDouble(rating);
+        private void displayStarsRating(String rate) {
+            double dRating = Double.parseDouble(rate);
             if (dRating <= 1.67) {
                 noteField3.setVisibility(View.INVISIBLE);
                 noteField2.setVisibility(View.INVISIBLE);
