@@ -74,8 +74,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private ProgressDialog loading;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser authUser = mAuth.getCurrentUser();
-    private String userUid;
-    private String mRadius;
+    private String userUid, mRadius;
+    private boolean permissionOK;
 
 
     public static MapFragment newInstance() {
@@ -110,11 +110,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapFragment.getMapAsync(this);
         getChildFragmentManager().beginTransaction().replace(R.id.map_fragment, mapFragment).commit();
 
-        /*recoveLocation();
-        if(userUid != null) {
-            recoveRadius();
-        }*/
-        //recoveLocation();
         refreshMap();
     }
 
@@ -135,31 +130,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(toulouseBounds.getCenter(), 12));
 
         // verify permission
+        verifyPermission();
+
+        if(!permissionOK){
+            verifyPermission();
+        }
+        if(userUid != null) {
+            recoveRadius();
+        }
+    }
+
+    private void verifyPermission(){
+        permissionOK = true;
         if (ActivityCompat.checkSelfPermission(requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
+            permissionOK = false;
             return;
         }
-        //recoveLocation();
-        if(userUid != null) {
-            recoveRadius();
-        }
-
-
         // filter my position
         map.setMyLocationEnabled(true);
         map.setOnMyLocationButtonClickListener(this);
         map.setOnInfoWindowClickListener(this);
-
     }
 
     private void refreshMap() {
-        utilsViewModel.refreshLiveData.observe(Objects.requireNonNull(getActivity()), new Observer<String>() {
+        utilsViewModel.refreshLiveData.observe(requireActivity(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 if(userUid != null && authUser != null) {
-                    //recoveLocation();
+                    map.clear();
                     recoveRadius();
                 }
             }
@@ -167,7 +168,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     public void recoveRadius() {
-        mFirestoreUserVM.getUser(userUid).observe(Objects.requireNonNull(getActivity()), new Observer<UserFirebase>() {
+        mFirestoreUserVM.getUser(userUid).observe(requireActivity(), new Observer<UserFirebase>() {
             @Override
             public void onChanged(UserFirebase user) {
                 mRadius = user.getCurrentRadius();
@@ -177,7 +178,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void recoveLocation(){
-        utilsViewModel.locationLiveData.observe(Objects.requireNonNull(getActivity()), new Observer<LatLng>() {
+        utilsViewModel.locationLiveData.observe(requireActivity(), new Observer<LatLng>() {
             @Override
             public void onChanged(LatLng latLng) {
                 mLatlng = latLng;
@@ -188,7 +189,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void recoveRestaurantsFromDatabase(double latitude, double longitude) {
-        mFirestoreRestaurantVM.getAllRestaurants().observe(Objects.requireNonNull(getActivity()), new Observer<List<Restaurant>>() {
+        mFirestoreRestaurantVM.getAllRestaurants().observe(requireActivity(), new Observer<List<Restaurant>>() {
             @Override
             public void onChanged(List<Restaurant> restaurants) {
                 MapFragment.this.restaurantsSaved.clear();
@@ -202,7 +203,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         String locationText = latitude + "," + longitude;
 
         if (scope != null) {
-            mRestaurantVM.getRestaurants(locationText, scope).observe(Objects.requireNonNull(getActivity()), new Observer<List<Restaurant>>() {
+            mRestaurantVM.getRestaurants(locationText, scope).observe(requireActivity(), new Observer<List<Restaurant>>() {
                 @Override
                 public void onChanged(List<Restaurant> restaurants) {
                     MapFragment.this.restaurantsList.clear();
@@ -236,6 +237,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                                 addRestaurantsToDatabase(restaurant.getPlace_id(), photoData, photoWidth, restaurant.getName(), restaurant.getVicinity(),
                                         type, rate, restaurant.getGeometry(), restaurant.getDetails(), restaurant.getOpening_hours());
                             }
+                        }else{
+                            addRestaurantsToDatabase(restaurant.getPlace_id(), photoData, photoWidth, restaurant.getName(), restaurant.getVicinity(),
+                                    type, rate, restaurant.getGeometry(), restaurant.getDetails(), restaurant.getOpening_hours());
                         }
                     }
                     markRestaurantsFromDatabase();

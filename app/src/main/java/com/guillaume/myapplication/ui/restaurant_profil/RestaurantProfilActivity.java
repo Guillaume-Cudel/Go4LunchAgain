@@ -111,12 +111,7 @@ public class RestaurantProfilActivity extends BaseActivity {
         phoneRestaurant();
         onClickWebsite();
         configureRecyclerView();
-    }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         getParticipantsList();
         getCurrentuser();
         verifyLikeButton();

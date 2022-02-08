@@ -399,7 +399,9 @@ public class NavigationActivity extends BaseActivity implements NavigationView.O
                 }
             });
         } else {
-            EasyPermissions.requestPermissions(this, getString(R.string.locationNotGranted), REQUEST_LOCATION_PERMISSION, perms);
+            //todo handle the permission denied 
+            EasyPermissions.requestPermissions(this, getString(R.string.locationNotGranted),
+                    REQUEST_LOCATION_PERMISSION, perms);
         }
     }
 
