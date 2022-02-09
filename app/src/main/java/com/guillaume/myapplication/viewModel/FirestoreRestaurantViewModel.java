@@ -40,23 +40,6 @@ public class FirestoreRestaurantViewModel extends ViewModel {
         RestaurantHelper.createRestaurantLikedUser(placeID, uid, username, urlPicture);
     }
 
-    public LiveData<Restaurant> getRestaurant(String placeID) {
-            restaurantLiveData = new MutableLiveData<Restaurant>();
-
-            RestaurantHelper.getTargetedRestaurant(placeID, new RestaurantHelper.GetRestaurantsTargetedCallback() {
-                @Override
-                public void onSuccess(Restaurant restaurant) {
-                    mRestaurant = restaurant;
-                    restaurantLiveData.postValue(mRestaurant);
-                }
-                @Override
-                public void onError(Exception exception) {
-                    restaurantLiveData.postValue(null);
-                }
-            });
-        return restaurantLiveData;
-    }
-
     public LiveData<UserFirebase> getUser(String placeID, String uid){
             userLiveData = new MutableLiveData<UserFirebase>();
 

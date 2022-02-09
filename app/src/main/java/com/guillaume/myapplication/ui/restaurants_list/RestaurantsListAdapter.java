@@ -32,7 +32,6 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
     private final Context context;
     private String photoData, photoWidth, restaurantLatitude, restaurantLongitude;
     private LatLng mlatlng;
-    private Restaurant restaurant;
     private RestaurantListClickInterface restaurantListClickInterface;
 
 
@@ -54,7 +53,7 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
     @Override
     public void onBindViewHolder(RestaurantsListViewHolder holder, int position) {
 
-        restaurant = dataList.get(holder.getBindingAdapterPosition());
+        Restaurant restaurant = dataList.get(holder.getBindingAdapterPosition());
         restaurantLatitude = restaurant.getGeometry().getLocation().getLat();
         restaurantLongitude = restaurant.getGeometry().getLocation().getLng();
 
@@ -94,9 +93,10 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
 
         if(restaurant.getParticipantsNumber() > 0){
             int participants = restaurant.getParticipantsNumber();
-            String intConvert = String.valueOf(participants);
-            String participantsText = "(" + intConvert + ")";
+            String participantsText = "(" + participants + ")";
             holder.participantsField.setText(participantsText);
+            holder.participantsIcon.setVisibility(View.VISIBLE);
+            holder.participantsField.setVisibility(View.VISIBLE);
         }else{
             holder.participantsIcon.setVisibility(View.INVISIBLE);
             holder.participantsField.setVisibility(View.INVISIBLE);
@@ -184,9 +184,15 @@ public class RestaurantsListAdapter extends RecyclerView.Adapter<RestaurantsList
             if (dRating <= 1.67) {
                 noteField3.setVisibility(View.INVISIBLE);
                 noteField2.setVisibility(View.INVISIBLE);
-            }
-            if (dRating > 1.67 && dRating < 3.4) {
+                noteField1.setVisibility(View.VISIBLE);
+            } else if (dRating > 1.67 && dRating < 3.4) {
                 noteField3.setVisibility(View.INVISIBLE);
+                noteField1.setVisibility(View.VISIBLE);
+                noteField2.setVisibility(View.VISIBLE);
+            } else {
+                noteField1.setVisibility(View.VISIBLE);
+                noteField2.setVisibility(View.VISIBLE);
+                noteField3.setVisibility(View.VISIBLE);
             }
         }
 

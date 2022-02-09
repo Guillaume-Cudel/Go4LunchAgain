@@ -22,7 +22,7 @@
         <entry key="app/src/main/res/layout/content_navigation.xml" value="0.14895833333333333" />
         <entry key="app/src/main/res/layout/fragment_map.xml" value="0.2101851851851852" />
         <entry key="app/src/main/res/layout/fragment_restaurants_list.xml" value="0.28229166666666666" />
-        <entry key="app/src/main/res/layout/item_restaurant.xml" value="0.55" />
+        <entry key="app/src/main/res/layout/item_restaurant.xml" value="0.45" />
         <entry key="app/src/main/res/layout/item_workmate.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/listview_item.xml" value="0.335" />
         <entry key="app/src/main/res/layout/nav_header_navigation.xml" value="0.28229166666666666" />
