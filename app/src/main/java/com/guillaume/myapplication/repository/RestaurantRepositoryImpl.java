@@ -4,11 +4,8 @@ import com.guillaume.myapplication.model.Details;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.requests.GetDetailsResponse;
 import com.guillaume.myapplication.model.requests.GetRestaurantsResponse;
-import com.guillaume.myapplication.model.requests.GetSearchingResponse;
 import com.guillaume.myapplication.network.ApiService;
-import com.guillaume.myapplication.viewModel.RestaurantViewModel;
 
-import java.security.Key;
 import java.util.List;
 
 import retrofit2.Call;
@@ -71,22 +68,4 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
             }
         });
     }
-
-    @Override
-    public void getSearchingRestaurant(String input, String key, GetSearchingCallback callback) {
-        Call<GetSearchingResponse> call = apiService.getSearch(input, key);
-        call.enqueue(new Callback<GetSearchingResponse>() {
-            @Override
-            public void onResponse(Call<GetSearchingResponse> call, Response<GetSearchingResponse> response) {
-                callback.onSuccess(response.body().getSearchingResult());
-            }
-
-            @Override
-            public void onFailure(Call<GetSearchingResponse> call, Throwable t) {
-                callback.onError(new Exception(t));
-            }
-        });
-    }
-
-
 }

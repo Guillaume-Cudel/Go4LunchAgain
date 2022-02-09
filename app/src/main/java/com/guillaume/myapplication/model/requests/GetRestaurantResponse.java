@@ -2,7 +2,7 @@ package com.guillaume.myapplication.model.requests;
 
 import com.guillaume.myapplication.model.Restaurant;
 
-public class GetSearchingResponse {
+public class GetRestaurantResponse {
 
     private Restaurant result;
 

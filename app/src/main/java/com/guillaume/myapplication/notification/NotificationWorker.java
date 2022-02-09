@@ -6,20 +6,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.telecom.Call;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.concurrent.futures.CallbackToFutureAdapter;
-import androidx.concurrent.futures.ResolvableFuture;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.work.ListenableWorker;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.android.volley.Response;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.guillaume.myapplication.NavigationActivity;
@@ -28,16 +22,12 @@ import com.guillaume.myapplication.api.RestaurantHelper;
 import com.guillaume.myapplication.api.UserHelper;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
+import com.guillaume.myapplication.repository.FirestoreRestaurantRepository;
 
-import java.io.IOException;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import javax.security.auth.callback.Callback;
 
 public class NotificationWorker extends Worker {
 
@@ -50,10 +40,12 @@ public class NotificationWorker extends Worker {
     private FirebaseUser authUser = mAuth.getCurrentUser();
     private String userID;
     private final String TAG = "NotificationWorker";
+    private FirestoreRestaurantRepository repository;
 
 
-    public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+    public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams, FirestoreRestaurantRepository repository) {
         super(context, workerParams);
+        this.repository = repository;
         if(authUser != null){
             userID = authUser.getUid();
         }
@@ -93,7 +85,7 @@ public class NotificationWorker extends Worker {
 
 
     private void recoveRestaurantData(String restaurantID, Context context) {
-        RestaurantHelper.getTargetedRestaurant(restaurantID, new RestaurantHelper.GetRestaurantsTargetedCallback() {
+        repository.getTargetedRestaurant(restaurantID, new FirestoreRestaurantRepository.GetRestaurantsTargetedCallback() {
             @Override
             public void onSuccess(Restaurant restaurant) {
                 mRestaurant = restaurant;

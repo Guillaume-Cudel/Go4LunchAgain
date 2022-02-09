@@ -12,7 +12,6 @@ import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
 import com.guillaume.myapplication.model.requests.Geometry;
 import com.guillaume.myapplication.model.requests.OpeningHours;
-import com.guillaume.myapplication.model.requests.Photos;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -106,6 +105,27 @@ public class RestaurantHelper {
         });
     }
 
+    public static List<UserFirebase> getAllParticipants(String placeID){
+        List<UserFirebase> users = new ArrayList<>();
+        RestaurantHelper.getUsersCollection(placeID).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Listen failed.", error);
+                }
+
+                //List<UserFirebase> users = new ArrayList<>();
+                if (value != null) {
+                    for (QueryDocumentSnapshot doc : value) {
+                        UserFirebase user = doc.toObject(UserFirebase.class);
+                        users.add(user);
+                    }
+                }
+            }
+        });
+        return users;
+    }
+
     public interface GetAllRestaurantssCallback {
         void onSuccess(List<Restaurant> list);
 
@@ -141,7 +161,7 @@ public class RestaurantHelper {
         void onError(Exception exception);
     }
 
-    public static void getTargetedUserCallback(String placeID, String uid, GetUserTargetedCallback callback) {
+    public static void getTargetedUser(String placeID, String uid, GetUserTargetedCallback callback) {
         DocumentReference docRef = RestaurantHelper.getUsersCollection(placeID).document(uid);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -226,7 +246,6 @@ public class RestaurantHelper {
                         transaction.update(docRef, PARTICIPANTS_NUMBER, newParticipantNumber);
                     }
                 } else {
-                    //double newParticipantNumber = snapshot.getDouble(PARTICIPANTS_NUMBER) -1;
                     Double participantNumber = snapshot.getDouble(PARTICIPANTS_NUMBER);
                     if (participantNumber != null) {
                         double newParticipantNumber = participantNumber - 1;

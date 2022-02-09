@@ -118,7 +118,8 @@ public class RestaurantProfilActivity extends BaseActivity {
     }
 
     private void getParticipantsList(){
-        fRestaurantViewModel.getParticipantsList(placeID)
+        //fRestaurantViewModel.getParticipantsList(placeID)
+        fRestaurantViewModel.getNewParticipantsList(placeID)
                 .observe(this, new Observer<List<UserFirebase>>() {
                     @Override
                     public void onChanged(List<UserFirebase> userFirebases) {

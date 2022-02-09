@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel;
 import com.guillaume.myapplication.api.UserHelper;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
+import com.guillaume.myapplication.repository.FirestoreRestaurantRepository;
+import com.guillaume.myapplication.repository.FirestoreUserRepository;
 
 import java.util.List;
 
@@ -16,20 +18,26 @@ public class FirestoreUserViewModel extends ViewModel {
     private UserFirebase mUser;
     private Restaurant mRestaurant;
 
+    private FirestoreUserRepository firestoreUserRepository;
+
+    public FirestoreUserViewModel(FirestoreUserRepository firestoreUserRepository){
+        this.firestoreUserRepository = firestoreUserRepository;
+    }
+
 
     public void createUser(String uid, String username, String urlPicture, String radius) {
-        UserHelper.createUser(uid, username, urlPicture, radius);
+        firestoreUserRepository.createUser(uid, username, urlPicture, radius);
     }
 
     public void createRestaurant(String uid, String placeID, String photoData, String photoWidth, String name,
                                  String vicinity, String type, String rating) {
-        UserHelper.createRestaurant(uid, placeID, photoData, photoWidth, name,
+        firestoreUserRepository.createRestaurant(uid, placeID, photoData, photoWidth, name,
                 vicinity, type, rating);
     }
 
     public LiveData<List<UserFirebase>> getUsersList() {
         MutableLiveData<List<UserFirebase>> usersListLiveData = new MutableLiveData<List<UserFirebase>>();
-        UserHelper.getAllUsers(new UserHelper.GetUsersListCallback() {
+        firestoreUserRepository.getUsersList(new UserHelper.GetUsersListCallback() {
             @Override
             public void onSuccess(List<UserFirebase> list) {
                 workmates = list;
@@ -49,7 +57,7 @@ public class FirestoreUserViewModel extends ViewModel {
     public LiveData<UserFirebase> getUser(String uid) {
 
         MutableLiveData<UserFirebase> getUserLiveData = new MutableLiveData<UserFirebase>();
-        UserHelper.getUser(uid, new UserHelper.GetUserCallback() {
+        firestoreUserRepository.getUser(uid, new UserHelper.GetUserCallback() {
             @Override
             public void onSuccess(UserFirebase user) {
                 mUser = user;
@@ -68,7 +76,7 @@ public class FirestoreUserViewModel extends ViewModel {
     public LiveData<Restaurant> getRestaurant(String uid, String placeID) {
 
         MutableLiveData<Restaurant> getRestaurantLiveData = new MutableLiveData<Restaurant>();
-        UserHelper.getRestaurant(uid, placeID, new UserHelper.GetRestaurantCallback() {
+        firestoreUserRepository.getRestaurant(uid, placeID, new UserHelper.GetRestaurantCallback() {
             @Override
             public void onSuccess(Restaurant restaurant) {
                 mRestaurant = restaurant;
@@ -84,26 +92,26 @@ public class FirestoreUserViewModel extends ViewModel {
     }
 
     public void updateRestaurantChoosed(String uid, String restaurantChoosed) {
-        UserHelper.updateRestaurantChoosed(uid, restaurantChoosed);
+        firestoreUserRepository.updateRestaurantChoosed(uid, restaurantChoosed);
     }
 
     public void updateFieldRestaurantName(String uid, String restaurantName) {
-        UserHelper.updateFieldRestaurantName(uid, restaurantName);
+        firestoreUserRepository.updateFieldRestaurantName(uid, restaurantName);
     }
 
     public void updateRadius(String uid, String currentRadius) {
-        UserHelper.updateRadius(uid, currentRadius);
+        firestoreUserRepository.updateRadius(uid, currentRadius);
     }
 
     public void deleteRestaurantChoosed(String uid) {
-        UserHelper.deleteRestaurantChoosed(uid);
+        firestoreUserRepository.deleteRestaurantChoosed(uid);
     }
 
     public void deleteRestaurantname(String uid) {
-        UserHelper.deleteRestaurantname(uid);
+        firestoreUserRepository.deleteRestaurantname(uid);
     }
 
     public void deleteRestaurant(String uid, String placeID) {
-        UserHelper.deleteRestaurant(uid, placeID);
+        firestoreUserRepository.deleteRestaurant(uid, placeID);
     }
 }

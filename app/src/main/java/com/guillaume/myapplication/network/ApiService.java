@@ -2,7 +2,7 @@ package com.guillaume.myapplication.network;
 
 import com.guillaume.myapplication.model.requests.GetDetailsResponse;
 import com.guillaume.myapplication.model.requests.GetRestaurantsResponse;
-import com.guillaume.myapplication.model.requests.GetSearchingResponse;
+import com.guillaume.myapplication.model.requests.GetRestaurantResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -26,7 +26,7 @@ public interface ApiService {
     //https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJJVG1yI-krhIRHg0g-oZVtcU&fields=formatted_phone_number,opening_hours,website&key=AIzaSyBpPAJjNZ2X4q0xz3p_zK_uW3MdZCpD704
 
     @GET("autocomplete/json?")
-    Call<GetSearchingResponse> getSearch(@Query("input") String input, @Query("key") String key);
+    Call<GetRestaurantResponse> getSearch(@Query("input") String input, @Query("key") String key);
 
 
 }
