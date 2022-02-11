@@ -30,11 +30,11 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     private void applyNotificationPeriodically() {
-        mWorkManager.enqueue(new PeriodicWorkRequest.Builder(NotificationWorker.class, 1, TimeUnit.DAYS)
+        /*mWorkManager.enqueue(new PeriodicWorkRequest.Builder(NotificationWorker.class, 1, TimeUnit.DAYS)
                 .setInitialDelay(1, TimeUnit.MINUTES)
                 .addTag(workID)
-                .build());
-        //mWorkManager.enqueue(OneTimeWorkRequest.from(NotificationWorker.class));
+                .build());*/
+        mWorkManager.enqueue(OneTimeWorkRequest.from(NotificationWorker.class));
         Log.e(TAG, "Send notification all days");
     }
 }

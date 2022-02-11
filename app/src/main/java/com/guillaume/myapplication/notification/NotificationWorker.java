@@ -101,12 +101,9 @@ public class NotificationWorker extends Worker {
         RestaurantHelper.getAllUsers(restaurantID, new RestaurantHelper.GetAllUsersCallback() {
             @Override
             public void onSuccess(List<UserFirebase> list) {
-                //boolean timeOk = verifyTime();
+                boolean timeOk = verifyTime();
                 workmates = list;
-                /*if(workmates.size() > 0 && timeOk) {
-                    sendNotification(context);
-                }*/
-                if(workmates.size() > 0) {
+                if(workmates.size() > 0 && timeOk) {
                     sendNotification(context);
                 }
             }
