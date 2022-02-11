@@ -40,12 +40,10 @@ public class NotificationWorker extends Worker {
     private FirebaseUser authUser = mAuth.getCurrentUser();
     private String userID;
     private final String TAG = "NotificationWorker";
-    private FirestoreRestaurantRepository repository;
 
 
-    public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams, FirestoreRestaurantRepository repository) {
+    public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
-        this.repository = repository;
         if(authUser != null){
             userID = authUser.getUid();
         }
@@ -85,7 +83,7 @@ public class NotificationWorker extends Worker {
 
 
     private void recoveRestaurantData(String restaurantID, Context context) {
-        repository.getTargetedRestaurant(restaurantID, new FirestoreRestaurantRepository.GetRestaurantsTargetedCallback() {
+        RestaurantHelper.getTargetedRestaurant(restaurantID, new RestaurantHelper.GetRestaurantsTargetedCallback() {
             @Override
             public void onSuccess(Restaurant restaurant) {
                 mRestaurant = restaurant;
@@ -103,9 +101,12 @@ public class NotificationWorker extends Worker {
         RestaurantHelper.getAllUsers(restaurantID, new RestaurantHelper.GetAllUsersCallback() {
             @Override
             public void onSuccess(List<UserFirebase> list) {
-                boolean timeOk = verifyTime();
+                //boolean timeOk = verifyTime();
                 workmates = list;
-                if(workmates.size() > 0 && timeOk) {
+                /*if(workmates.size() > 0 && timeOk) {
+                    sendNotification(context);
+                }*/
+                if(workmates.size() > 0) {
                     sendNotification(context);
                 }
             }
