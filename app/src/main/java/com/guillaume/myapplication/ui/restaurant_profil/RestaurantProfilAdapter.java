@@ -43,7 +43,7 @@ public class RestaurantProfilAdapter extends RecyclerView.Adapter<RestaurantProf
     @Override
     public void onBindViewHolder(@NonNull RestaurantProfilAdapter.RestaurantProfilViewHolder holder, int position) {
 
-        UserFirebase user = participantsList.get(holder.getAdapterPosition());
+        UserFirebase user = participantsList.get(holder.getBindingAdapterPosition());
 
         String photo = user.getUrlPicture();
         if (photo != null){
@@ -57,7 +57,7 @@ public class RestaurantProfilAdapter extends RecyclerView.Adapter<RestaurantProf
         }
 
         String username = user.getUsername();
-        String restaurantLess = username + " is joining !";
+        String restaurantLess = username + context.getString(R.string.joining);
         holder.usernameText.setText(restaurantLess);
     }
 

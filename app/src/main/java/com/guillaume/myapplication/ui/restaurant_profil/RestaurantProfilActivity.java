@@ -402,8 +402,8 @@ public class RestaurantProfilActivity extends BaseActivity {
                     openWebURL(websiteURL);
                 } else {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(RestaurantProfilActivity.this);
-                    dialog.setTitle("This restaurant doesn't have a website");
-                    dialog.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                    dialog.setTitle(R.string.website_message);
+                    dialog.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();

@@ -60,5 +60,8 @@
     <string name="search_restaurants">Search restaurant</string>
     <string name="is_eating"> is eating </string>
     <string name="not_decided"> hasn\'t decided yet.</string>
+    <string name="joining">\" is joining !\"</string>
+    <string name="website_message">This restaurant doesn\'t have a website</string>
+    <string name="close">Close</string>
 
 </resources>

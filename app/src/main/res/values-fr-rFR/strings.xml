@@ -39,4 +39,7 @@
     <string name="search_restaurants">Chercher un restaurant</string>
     <string name="is_eating">" mange à "</string>
     <string name="not_decided">" ne s'est pas décidé."</string>
+    <string name="joining">" y mange !"</string>
+    <string name="website_message">Ce restaurant n\'a pas de site web.</string>
+    <string name="close">Fermer</string>
 </resources>
