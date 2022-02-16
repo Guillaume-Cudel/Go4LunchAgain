@@ -136,7 +136,7 @@ public class NotificationWorker extends Worker {
         Date min = calendar.getTime();
 
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 1);
+        calendar.set(Calendar.MINUTE, 30);
         Date max = calendar.getTime();
 
         if(now.compareTo(min) >= 0){

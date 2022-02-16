@@ -14,10 +14,6 @@ import java.util.List;
 
 public class FirestoreUserViewModel extends ViewModel {
 
-    private List<UserFirebase> workmates;
-    private UserFirebase mUser;
-    private Restaurant mRestaurant;
-
     private FirestoreUserRepository firestoreUserRepository;
 
     public FirestoreUserViewModel(FirestoreUserRepository firestoreUserRepository){
@@ -40,8 +36,7 @@ public class FirestoreUserViewModel extends ViewModel {
         firestoreUserRepository.getUsersList(new UserHelper.GetUsersListCallback() {
             @Override
             public void onSuccess(List<UserFirebase> list) {
-                workmates = list;
-                usersListLiveData.postValue(workmates);
+                usersListLiveData.postValue(list);
             }
 
             @Override
@@ -60,8 +55,8 @@ public class FirestoreUserViewModel extends ViewModel {
         firestoreUserRepository.getUser(uid, new UserHelper.GetUserCallback() {
             @Override
             public void onSuccess(UserFirebase user) {
-                mUser = user;
-                getUserLiveData.postValue(mUser);
+                //mUser = user;
+                getUserLiveData.postValue(user);
             }
 
             @Override
@@ -79,8 +74,7 @@ public class FirestoreUserViewModel extends ViewModel {
         firestoreUserRepository.getRestaurant(uid, placeID, new UserHelper.GetRestaurantCallback() {
             @Override
             public void onSuccess(Restaurant restaurant) {
-                mRestaurant = restaurant;
-                getRestaurantLiveData.postValue(mRestaurant);
+                getRestaurantLiveData.postValue(restaurant);
             }
 
             @Override

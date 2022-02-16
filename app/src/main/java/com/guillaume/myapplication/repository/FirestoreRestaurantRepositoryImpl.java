@@ -31,80 +31,30 @@ public class FirestoreRestaurantRepositoryImpl implements FirestoreRestaurantRep
     }
 
     @Override
-    public void getParticipantsList(String placeID, GetAllUsersCallback callback) {
-        RestaurantHelper.getAllUsers(placeID, new RestaurantHelper.GetAllUsersCallback() {
-            @Override
-            public void onSuccess(List<UserFirebase> list) {
-                callback.onSuccess(list);
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                callback.onError(exception);
-            }
-        });
+    public void getParticipantsList(String placeID, RestaurantHelper.GetAllUsersCallback callback) {
+        RestaurantHelper.getAllUsers(placeID, callback);
     }
 
     //----------
 
     @Override
-    public void getAllRestaurants(GetAllRestaurantssCallback callback) {
-        RestaurantHelper.getAllRestaurants(new RestaurantHelper.GetAllRestaurantssCallback() {
-            @Override
-            public void onSuccess(List<Restaurant> list) {
-                callback.onSuccess(list);
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                callback.onError(exception);
-            }
-        });
+    public void getAllRestaurants(RestaurantHelper.GetAllRestaurantssCallback callback) {
+        RestaurantHelper.getAllRestaurants(callback);
     }
 
     @Override
-    public void getUser(String placeID, String uid, GetUserTargetedCallback callback) {
-        RestaurantHelper.getTargetedUser(placeID, uid, new RestaurantHelper.GetUserTargetedCallback() {
-            @Override
-            public void onSuccess(UserFirebase user) {
-                callback.onSuccess(user);
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                callback.onError(exception);
-            }
-        });
+    public void getUser(String placeID, String uid, RestaurantHelper.GetUserTargetedCallback callback) {
+        RestaurantHelper.getTargetedUser(placeID, uid, callback);
     }
 
     @Override
-    public void getTargetedRestaurant(String placeId, GetRestaurantsTargetedCallback callback) {
-        RestaurantHelper.getTargetedRestaurant(placeId, new RestaurantHelper.GetRestaurantsTargetedCallback() {
-            @Override
-            public void onSuccess(Restaurant restaurant) {
-                callback.onSuccess(restaurant);
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                callback.onError(exception);
-            }
-        });
+    public void getTargetedRestaurant(String placeId, RestaurantHelper.GetRestaurantsTargetedCallback callback) {
+        RestaurantHelper.getTargetedRestaurant(placeId, callback);
     }
 
     @Override
-    public void getUserRestaurantLiked(String placeID, String uid, GetUserRestaurantLikedCallback callback) {
-        RestaurantHelper.getUserRestaurantLiked(placeID, uid, new RestaurantHelper.GetUserRestaurantLikedCallback() {
-            @Override
-            public void onSuccess(UserFirebase user) {
-                callback.onSuccess(user);
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                callback.onError(exception);
-            }
-        });
+    public void getUserRestaurantLiked(String placeID, String uid, RestaurantHelper.GetUserRestaurantLikedCallback callback) {
+        RestaurantHelper.getUserRestaurantLiked(placeID, uid, callback);
     }
 
     public void  updateParticipantNumber(String placeID, boolean addParticipant){

@@ -21,10 +21,6 @@ public class FirestoreRestaurantViewModel extends ViewModel {
     private MutableLiveData<List<Restaurant>> restaurantsListLiveData;
     private MutableLiveData<UserFirebase> userLikedLiveData;
 
-    private UserFirebase mUser, mUserLiked;
-    private List<UserFirebase> mParticipants;
-    private List<Restaurant> mRestaurantsList;
-
     private final FirestoreRestaurantRepository firestoreRestaurantRepository;
 
     public FirestoreRestaurantViewModel(FirestoreRestaurantRepository firestoreRestaurantRepository){
@@ -44,16 +40,13 @@ public class FirestoreRestaurantViewModel extends ViewModel {
         firestoreRestaurantRepository.createUserRestaurantLiked(placeID, uid, username, urlPicture);
     }
 
-    //todo to test
     public LiveData<UserFirebase> getUser(String placeID, String uid){
             userLiveData = new MutableLiveData<UserFirebase>();
 
-            //RestaurantHelper.getTargetedUser(placeID, uid, new RestaurantHelper.GetUserTargetedCallback() {
-        firestoreRestaurantRepository.getUser(placeID, uid, new FirestoreRestaurantRepository.GetUserTargetedCallback() {
+        firestoreRestaurantRepository.getUser(placeID, uid, new RestaurantHelper.GetUserTargetedCallback() {
                 @Override
                 public void onSuccess(UserFirebase user) {
-                    mUser = user;
-                    userLiveData.postValue(mUser);
+                    userLiveData.postValue(user);
                 }
 
                 @Override
@@ -64,15 +57,13 @@ public class FirestoreRestaurantViewModel extends ViewModel {
         return userLiveData;
     }
 
-    // ok
     public LiveData<List<UserFirebase>> getNewParticipantsList(String placeID){
         if(participantsListLiveData == null){
             participantsListLiveData = new MutableLiveData<List<UserFirebase>>();
-            firestoreRestaurantRepository.getParticipantsList(placeID, new FirestoreRestaurantRepository.GetAllUsersCallback() {
+            firestoreRestaurantRepository.getParticipantsList(placeID, new RestaurantHelper.GetAllUsersCallback() {
                 @Override
                 public void onSuccess(List<UserFirebase> list) {
-                    mParticipants = list;
-                    participantsListLiveData.postValue(mParticipants);
+                    participantsListLiveData.postValue(list);
                 }
 
                 @Override
@@ -84,16 +75,13 @@ public class FirestoreRestaurantViewModel extends ViewModel {
         return participantsListLiveData;
     }
 
-    // test it
     public LiveData<List<Restaurant>> getAllRestaurants(){
         if(restaurantsListLiveData == null){
             restaurantsListLiveData = new MutableLiveData<List<Restaurant>>();
-            //RestaurantHelper.getAllRestaurants(new RestaurantHelper.GetAllRestaurantssCallback() {
-            firestoreRestaurantRepository.getAllRestaurants(new FirestoreRestaurantRepository.GetAllRestaurantssCallback() {
+            firestoreRestaurantRepository.getAllRestaurants(new RestaurantHelper.GetAllRestaurantssCallback() {
                 @Override
                 public void onSuccess(List<Restaurant> list) {
-                    mRestaurantsList = list;
-                    restaurantsListLiveData.postValue(mRestaurantsList);
+                    restaurantsListLiveData.postValue(list);
                 }
 
                 @Override
@@ -105,16 +93,13 @@ public class FirestoreRestaurantViewModel extends ViewModel {
         return restaurantsListLiveData;
     }
 
-    //test it
     public LiveData<UserFirebase> getUserRestaurantLiked(String placeID, String uid){
         userLikedLiveData = new MutableLiveData<UserFirebase>();
 
-        //RestaurantHelper.getUserRestaurantLiked(placeID, uid, new RestaurantHelper.GetUserRestaurantLikedCallback() {
-        firestoreRestaurantRepository.getUserRestaurantLiked(placeID, uid, new FirestoreRestaurantRepository.GetUserRestaurantLikedCallback() {
+        firestoreRestaurantRepository.getUserRestaurantLiked(placeID, uid, new RestaurantHelper.GetUserRestaurantLikedCallback() {
             @Override
             public void onSuccess(UserFirebase user) {
-                mUserLiked = user;
-                userLikedLiveData.postValue(mUserLiked);
+                userLikedLiveData.postValue(user);
             }
 
             @Override

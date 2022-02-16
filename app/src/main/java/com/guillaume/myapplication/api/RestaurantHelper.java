@@ -105,7 +105,7 @@ public class RestaurantHelper {
         });
     }
 
-    public static List<UserFirebase> getAllParticipants(String placeID){
+    /*public static List<UserFirebase> getAllParticipants(String placeID){
         List<UserFirebase> users = new ArrayList<>();
         RestaurantHelper.getUsersCollection(placeID).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -124,7 +124,7 @@ public class RestaurantHelper {
             }
         });
         return users;
-    }
+    }*/
 
     public interface GetAllRestaurantssCallback {
         void onSuccess(List<Restaurant> list);

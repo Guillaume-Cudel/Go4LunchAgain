@@ -1,5 +1,6 @@
 package com.guillaume.myapplication.repository;
 
+import com.guillaume.myapplication.api.RestaurantHelper;
 import com.guillaume.myapplication.model.Details;
 import com.guillaume.myapplication.model.Restaurant;
 import com.guillaume.myapplication.model.firestore.UserFirebase;
@@ -17,45 +18,19 @@ public interface FirestoreRestaurantRepository {
 
     void createUserRestaurantLiked(String placeID, String uid, String username, String urlPicture);
 
-
-    interface GetAllUsersCallback {
-        void onSuccess(List<UserFirebase> list);
-
-        void onError(Exception exception);
-    }
-    void getParticipantsList(String placeID, GetAllUsersCallback callback);
+    void getParticipantsList(String placeID, RestaurantHelper.GetAllUsersCallback callback);
 
 
-    interface GetAllRestaurantssCallback {
-        void onSuccess(List<Restaurant> list);
-
-        void onError(Exception exception);
-    }
-    void getAllRestaurants(GetAllRestaurantssCallback callback);
+    void getAllRestaurants(RestaurantHelper.GetAllRestaurantssCallback callback);
 
 
-    interface GetUserTargetedCallback {
-        void onSuccess(UserFirebase user);
-
-        void onError(Exception exception);
-    }
-    void getUser(String placeID, String uid, GetUserTargetedCallback callback);
+    void getUser(String placeID, String uid, RestaurantHelper.GetUserTargetedCallback callback);
 
 
-    interface GetRestaurantsTargetedCallback {
-        void onSuccess(Restaurant restaurant);
-
-        void onError(Exception exception);
-    }
-    void getTargetedRestaurant(String placeId, GetRestaurantsTargetedCallback callback);
+    void getTargetedRestaurant(String placeId, RestaurantHelper.GetRestaurantsTargetedCallback callback);
 
 
-    interface GetUserRestaurantLikedCallback {
-        void onSuccess(UserFirebase user);
-
-        void onError(Exception exception);
-    }
-    void getUserRestaurantLiked(String placeID, String uid, GetUserRestaurantLikedCallback callback);
+    void getUserRestaurantLiked(String placeID, String uid, RestaurantHelper.GetUserRestaurantLikedCallback callback);
 
     void  updateParticipantNumber(String placeID, boolean addParticipant);
 

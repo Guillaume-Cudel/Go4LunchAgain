@@ -22,47 +22,17 @@ public class FirestoreUserRepositoryImpl implements FirestoreUserRepository {
 
     @Override
     public void getUsersList(UserHelper.GetUsersListCallback callback) {
-        UserHelper.getAllUsers(new UserHelper.GetUsersListCallback() {
-            @Override
-            public void onSuccess(List<UserFirebase> list) {
-                callback.onSuccess(list);
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                callback.onError(exception);
-            }
-        });
+        UserHelper.getAllUsers(callback);
     }
 
     @Override
     public void getUser(String uid, UserHelper.GetUserCallback callback) {
-        UserHelper.getUser(uid, new UserHelper.GetUserCallback() {
-            @Override
-            public void onSuccess(UserFirebase user) {
-                callback.onSuccess(user);
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                callback.onError(exception);
-            }
-        });
+        UserHelper.getUser(uid, callback );
     }
 
     @Override
     public void getRestaurant(String uid, String placeID, UserHelper.GetRestaurantCallback callback) {
-        UserHelper.getRestaurant(uid, placeID, new UserHelper.GetRestaurantCallback() {
-            @Override
-            public void onSuccess(Restaurant restaurant) {
-                callback.onSuccess(restaurant);
-            }
-
-            @Override
-            public void onError(Exception exception) {
-                callback.onError(exception);
-            }
-        });
+        UserHelper.getRestaurant(uid, placeID, callback);
     }
 
     @Override
