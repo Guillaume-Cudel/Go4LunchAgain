@@ -44,6 +44,7 @@ public class FirestoreRestaurantViewModelTest {
 
         /*doNothing().when(viewModel).createRestaurant("", "", "", "", "",
                 "", "", geometry, details, openingHours);*/
+        
         viewModel = new FirestoreRestaurantViewModel(repository);
         viewModel.createRestaurant("id", null, null, "Pizza", null, null, null, null,
                 null, null);

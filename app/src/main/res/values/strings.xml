@@ -63,5 +63,6 @@
     <string name="joining">\" is joining !\"</string>
     <string name="website_message">This restaurant doesn\'t have a website</string>
     <string name="close">Close</string>
+    <string name="phone_number_message">This restaurant doesn\'t have a phone number</string>
 
 </resources>

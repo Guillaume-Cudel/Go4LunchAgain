@@ -345,22 +345,35 @@ public class RestaurantProfilActivity extends BaseActivity {
         callImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                phoneNum = phoneNum.replaceAll("\\s+", "");
+                if(phoneNum != null) {
+                    phoneNum = phoneNum.replaceAll("\\s+", "");
 
-                if (ActivityCompat.shouldShowRequestPermissionRationale(RestaurantProfilActivity.this,
-                        android.Manifest.permission.CALL_PHONE)) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(RestaurantProfilActivity.this,
+                            android.Manifest.permission.CALL_PHONE)) {
 
-                    ActivityCompat.requestPermissions(RestaurantProfilActivity.this,
-                            new String[]{Manifest.permission.READ_PHONE_STATE},
-                            REQUEST_CALL_PHONE_PERMISSION);
+                        ActivityCompat.requestPermissions(RestaurantProfilActivity.this,
+                                new String[]{Manifest.permission.READ_PHONE_STATE},
+                                REQUEST_CALL_PHONE_PERMISSION);
+                    } else {
+
+                        ActivityCompat.requestPermissions(RestaurantProfilActivity.this,
+                                new String[]{Manifest.permission.CALL_PHONE},
+                                REQUEST_CALL_PHONE_PERMISSION);
+                    }
                 } else {
-
-                    ActivityCompat.requestPermissions(RestaurantProfilActivity.this,
-                            new String[]{Manifest.permission.CALL_PHONE},
-                            REQUEST_CALL_PHONE_PERMISSION);
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(RestaurantProfilActivity.this);
+                    dialog.setTitle(R.string.phone_number_message);
+                    dialog.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    dialog.show();
                 }
             }
         });
+
     }
 
 
@@ -386,8 +399,6 @@ public class RestaurantProfilActivity extends BaseActivity {
             case REQUEST_CALL_PHONE_PERMISSION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     dialPhoneNumber(phoneNum);
-                } else {
-
                 }
                 return;
             }
