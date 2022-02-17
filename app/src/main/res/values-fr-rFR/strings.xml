@@ -42,4 +42,5 @@
     <string name="joining">" y mange !"</string>
     <string name="website_message">Ce restaurant n\'a pas de site web.</string>
     <string name="close">Fermer</string>
+    <string name="phone_number_message">Ce restaurant n\'a pas de numero de telephone</string>
 </resources>
